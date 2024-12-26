@@ -1,0 +1,23 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+[project]
+name = "woo_py"
+version = "0.0.1"
+dependencies = [
+    "requests",
+    "pydantic",
+    "woocommerce",
+]
+[project-optional-dependencies]
+test = [
+    "python-dotenv",
+    "pytest",
+    "requests_mock",
+]
+authors = [
+  { name="gronnmann", email="gronnmannthecoder@gmail.com" },
+]
+description = "A wrapper for the WooCommerce API using pydantic models"
+readme = "README.md"
+requires-python = ">=3.12"
