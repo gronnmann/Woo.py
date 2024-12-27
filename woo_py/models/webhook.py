@@ -1,5 +1,6 @@
+import datetime
+
 from pydantic import BaseModel
-from datetime import datetime
 from enum import Enum
 
 
@@ -27,6 +28,13 @@ class WebhookTopic(str, Enum):
     PRODUCT_DELETED = "product.deleted"
 
 
+class WebhookEdit(BaseModel):
+    name: str | None = None
+    status: WebhookStatus | None = None
+    topic: str | WebhookTopic | None = None
+    secret: str | None = None
+
+
 class Webhook(BaseModel):
     id: int | None = None
     name: str | None = None
@@ -37,7 +45,15 @@ class Webhook(BaseModel):
     hooks: list[str] | None = None
     delivery_url: str
     secret: str | None = None
-    date_created: datetime | None = None
-    date_created_gmt: datetime | None = None
-    date_modified: datetime | None = None
-    date_modified_gmt: datetime | None = None
+    date_created: datetime.datetime | None = None
+    date_created_gmt: datetime.datetime | None = None
+    date_modified: datetime.datetime | None = None
+    date_modified_gmt: datetime.datetime | None = None
+
+    def to_edit(self) -> WebhookEdit:
+        return WebhookEdit(
+            name=self.name,
+            status=self.status,
+            topic=self.topic,
+            secret=self.secret,
+        )

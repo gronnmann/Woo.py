@@ -47,3 +47,6 @@ woo_py.create_webhook(webhook)
 Take a look at the `woo.py` file to see all the available methods, and in the `models` folder for 
 the defined models. 
 These correspond to the ones found [here](https://woocommerce.github.io/woocommerce-rest-api-docs/)
+
+For `PUT` request, use corresponding `{model}Edit` models, as they explicitly show the editable fields.
+Most models can be changed to `Edit` models usign the `to_edit` method.
