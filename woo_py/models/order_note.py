@@ -1,9 +1,10 @@
 import datetime
 
 from pydantic import BaseModel
+from pydantic_changedetect import ChangeDetectionMixin
 
 
-class OrderNote(BaseModel):
+class OrderNote(ChangeDetectionMixin, BaseModel):
     id: int | None = None
     author: str | None = None
     date_created: datetime.datetime | None = None

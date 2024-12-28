@@ -1,0 +1,2 @@
+This sample data is taken from the WooCommerce REST API documentation:
+https://woocommerce.github.io/woocommerce-rest-api-docs/

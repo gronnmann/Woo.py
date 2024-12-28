@@ -1,0 +1,32 @@
+{
+  "id": 142,
+  "name": "Order updated",
+  "status": "active",
+  "topic": "order.updated",
+  "resource": "order",
+  "event": "updated",
+  "hooks": [
+    "woocommerce_process_shop_order_meta",
+    "woocommerce_api_edit_order",
+    "woocommerce_order_edit_status",
+    "woocommerce_order_status_changed"
+  ],
+  "delivery_url": "http://requestb.in/1g0sxmo1",
+  "date_created": "2016-05-15T23:17:52",
+  "date_created_gmt": "2016-05-15T20:17:52",
+  "date_modified": "2016-05-15T23:17:52",
+  "date_modified_gmt": "2016-05-15T20:17:52",
+  "_links": {
+    "self": [
+      {
+        "href": "https://example.com/wp-json/wc/v3/webhooks/142"
+      }
+    ],
+    "collection": [
+      {
+        "href": "https://example.com/wp-json/wc/v3/webhooks"
+      }
+    ]
+  }
+}
+

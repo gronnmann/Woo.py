@@ -1,0 +1,25 @@
+{
+  "id": 281,
+  "author": "system",
+  "date_created": "2017-03-21T16:46:41",
+  "date_created_gmt": "2017-03-21T19:46:41",
+  "note": "Order ok!!!",
+  "customer_note": false,
+  "_links": {
+    "self": [
+      {
+        "href": "https://example.com/wp-json/wc/v3/orders/723/notes/281"
+      }
+    ],
+    "collection": [
+      {
+        "href": "https://example.com/wp-json/wc/v3/orders/723/notes"
+      }
+    ],
+    "up": [
+      {
+        "href": "https://example.com/wp-json/wc/v3/orders/723"
+      }
+    ]
+  }
+}

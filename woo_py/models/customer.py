@@ -1,10 +1,12 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+from pydantic_changedetect import ChangeDetectionMixin
+
 from woo_py.models import MetaData, BillingAddress, ShippingAddress
 
 
-class Customer(BaseModel):
+class Customer(ChangeDetectionMixin, BaseModel):
     id: int | None = None
     date_created: datetime | None = None
     date_created_gmt: datetime | None = None

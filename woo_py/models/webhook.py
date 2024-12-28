@@ -3,6 +3,8 @@ import datetime
 from pydantic import BaseModel
 from enum import Enum
 
+from pydantic_changedetect import ChangeDetectionMixin
+
 
 class WebhookStatus(str, Enum):
     ACTIVE = "active"
@@ -28,17 +30,10 @@ class WebhookTopic(str, Enum):
     PRODUCT_DELETED = "product.deleted"
 
 
-class WebhookEdit(BaseModel):
-    name: str | None = None
-    status: WebhookStatus | None = None
-    topic: str | WebhookTopic | None = None
-    secret: str | None = None
-
-
-class Webhook(BaseModel):
+class Webhook(ChangeDetectionMixin, BaseModel):
     id: int | None = None
     name: str | None = None
-    status: WebhookStatus | None = WebhookStatus.ACTIVE
+    status: WebhookStatus = WebhookStatus.ACTIVE
     topic: str | WebhookTopic
     resource: str | None = None
     event: str | None = None
@@ -49,11 +44,3 @@ class Webhook(BaseModel):
     date_created_gmt: datetime.datetime | None = None
     date_modified: datetime.datetime | None = None
     date_modified_gmt: datetime.datetime | None = None
-
-    def to_edit(self) -> WebhookEdit:
-        return WebhookEdit(
-            name=self.name,
-            status=self.status,
-            topic=self.topic,
-            secret=self.secret,
-        )

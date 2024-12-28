@@ -47,6 +47,14 @@ woo_py.create_webhook(webhook)
 Take a look at the `woo.py` file to see all the available methods, and in the `models` folder for 
 the defined models. 
 These correspond to the ones found [here](https://woocommerce.github.io/woocommerce-rest-api-docs/)
+# Running tests
+To run the tests, you need to have a WooCommerce store running, and set the following environment variables
+in `test/.env`:
+- `WC_URL` - The URL to your WooCommerce store
+- `WC_CONSUMER_KEY` - The consumer key for the WooCommerce API
+- `WC_CONSUMER_SECRET` - The consumer secret for the WooCommerce API
 
-For `PUT` request, use corresponding `{model}Edit` models, as they explicitly show the editable fields.
-Most models can be changed to `Edit` models usign the `to_edit` method.
+After that, you can run the tests using `pytest`:
+```bash
+pytest test
+```

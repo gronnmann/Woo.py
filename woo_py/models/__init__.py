@@ -1,6 +1,6 @@
 from enum import Enum
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class MetaData(BaseModel):
@@ -37,8 +37,8 @@ class TaxLine(BaseModel):
     tax_total: float | None = (
         None  # Tax total (not including shipping taxes), read-only.
     )
-    shipping_tax_total: float | None = None  # Shipping tax total, read-only.
-    meta_data: list[MetaData] | None = None  # Meta data.
+    shipping_tax_total: str | None = None  # Shipping tax total, read-only.
+    meta_data: list[MetaData] = []  # Meta data.
 
 
 class TaxStatus(str, Enum):
@@ -47,38 +47,53 @@ class TaxStatus(str, Enum):
 
 
 class FeeLine(BaseModel):
+    model_config = ConfigDict(coerce_numbers_to_str=True)
     id: int | None = None
     name: str | None = None
     tax_class: str | None = None
     tax_status: TaxStatus
-    total: float | None = None
-    total_tax: float | None = None
-    taxes: list[TaxLine] | None = None
-    meta_data: list[MetaData] | None = None
+    total: str | None = None
+    total_tax: str | None = None
+    taxes: list[TaxLine] = []
+    meta_data: list[MetaData] = []
 
 
 class ShippingLine(BaseModel):
-    id: int | None = None
+    model_config = ConfigDict(coerce_numbers_to_str=True)
+    id: str | None = None
     method_title: str | None = None
-    method_id: int | None = None
+    method_id: str | None = None
     total: str | None = None
     total_tax: str | None = None
-    taxes: list[TaxLine] | None = None
-    meta_data: list[MetaData] | None = None
+    taxes: list[TaxLine] = []
+    meta_data: list[MetaData] = []
 
 
 class LineItem(BaseModel):
+    model_config = ConfigDict(coerce_numbers_to_str=True)
     id: int | None = None
     name: str | None = None
     product_id: int | None = None
     variation_id: int | None = None
     quantity: int | None = None
     tax_class: str | None = None
-    subtotal: float | None = None
-    subtotal_tax: float | None = None
-    total: float | None = None
-    total_tax: float | None = None
-    taxes: list[TaxLine] | None = None
-    meta_data: list[MetaData] | None = None
+    subtotal: str | None = None
+    subtotal_tax: str | None = None
+    total: str | None = None
+    total_tax: str | None = None
+    taxes: list[TaxLine] = []
+    meta_data: list[MetaData] = []
     sku: str | None = None
-    price: float | None = None
+    price: str | None = None
+
+
+class Dimensions(BaseModel):
+    length: str = None
+    width: str = None
+    height: str = None
+
+
+class DownloadProperties(BaseModel):
+    id: int
+    name: str
+    file: str

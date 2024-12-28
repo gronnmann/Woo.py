@@ -2,6 +2,8 @@ from pydantic import BaseModel
 from datetime import datetime
 from enum import Enum
 
+from pydantic_changedetect import ChangeDetectionMixin
+
 from woo_py.models import MetaData
 
 
@@ -11,7 +13,7 @@ class DiscountType(str, Enum):
     FIXED_PRODUCT = "fixed_product"
 
 
-class Coupon(BaseModel):
+class Coupon(ChangeDetectionMixin, BaseModel):
     id: int | None = None
     code: str
     amount: str | None = None
