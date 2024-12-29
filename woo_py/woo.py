@@ -1,5 +1,6 @@
 from loguru import logger
 from pydantic import BaseModel
+from pydantic_changedetect import ChangeDetectionMixin
 from requests import Response, HTTPError
 from woocommerce import API
 
@@ -33,6 +34,18 @@ class Woo:
     def __init__(self, api_object: API) -> None:
         self.api_object = api_object
 
+    def _get(self, endpoint: str, base_class: t.Type[BaseModel], **params) -> BaseModel | None:
+        """
+        Gets an object from an endpoint.
+        :return parsed object or None if not found
+        """
+
+        response = self.api_object.get(endpoint, params=params)
+        if response.status_code == 404:
+            return None
+        _check_for_errors(response)
+        return base_class.model_validate(response.json())
+
     def _get_all(self, endpoint: str, base_class: t.Type[BaseModel], **params) -> list[t.Any]:
         """
         Gets all objects from an endpoint.
@@ -44,6 +57,46 @@ class Woo:
         response = self.api_object.get(endpoint, params=params)
         _check_for_errors(response)
         return [base_class.model_validate(obj) for obj in response.json()]
+
+    def _post(self, endpoint: str, model: BaseModel) -> BaseModel:
+        """
+        Posts an object to an endpoint.
+
+        :param endpoint: the endpoint to post to
+        :param model: the model to post
+
+        :return: the created object
+        """
+
+        base_class = type(model)
+
+        response = self.api_object.post(endpoint, data=None, json=model.model_dump())
+        _check_for_errors(response)
+        return base_class.model_validate(response.json())
+
+    def _put(self, endpoint: str, model: [BaseModel, ChangeDetectionMixin]) -> t.Any:
+        """
+        Puts an object to an endpoint.
+
+        :param endpoint: the endpoint to put to
+        :param model: the model to put
+
+        :return: the updated object
+        """
+
+        base_class = type(model)
+
+        response = self.api_object.put(endpoint, data=None, json=model.model_dump(exclude_unchanged=True))
+        _check_for_errors(response)
+        return base_class.model_validate(response.json())
+
+    def _delete(self, endpoint: str, **params) -> None:
+        """
+        Deletes an object from an endpoint.
+        """
+
+        response = self.api_object.delete(endpoint, params=params)
+        _check_for_errors(response)
 
     def create_coupon(self, coupon: Coupon):
         """
@@ -61,28 +114,24 @@ class Woo:
         :param coupon_id: id of the coupon
         :return:
         """
-        response = self.api_object.get(f"coupons/{coupon_id}")
-        if response.status_code == 404:
-            return None
-        _check_for_errors(response)
-        return Coupon.model_validate(response.json())
+        return self._get(f"coupons/{coupon_id}", Coupon)
 
     def list_coupons(
-        self,
-        context: ContextType = "view",
-        page: int = 0,
-        per_page: int = 10,
-        search: str | None = None,
-        after: str | None = None,
-        before: str | None = None,
-        exclude: list[int] | None = None,
-        include: list[int] | None = None,
-        offset: int = 0,
-        order: OrderType = "asc",
-        orderby: t.Literal[
-            "date", "modified", "id", "include", "title", "slug"
-        ] = "date",
-        code: str | None = None,
+            self,
+            context: ContextType = "view",
+            page: int = 0,
+            per_page: int = 10,
+            search: str | None = None,
+            after: str | None = None,
+            before: str | None = None,
+            exclude: list[int] | None = None,
+            include: list[int] | None = None,
+            offset: int = 0,
+            order: OrderType = "asc",
+            orderby: t.Literal[
+                "date", "modified", "id", "include", "title", "slug"
+            ] = "date",
+            code: str | None = None,
     ) -> list[Coupon]:
         """
         Lists all coupons.
@@ -112,11 +161,7 @@ class Woo:
         :param coupon: Coupon object
         :return:
         """
-        response = self.api_object.put(
-            f"coupons/{coupon_id}", data=coupon.model_dump(exclude_unchanged=True)
-        )
-        _check_for_errors(response)
-        return Coupon.model_validate(response.json())
+        return self._put(f"coupons/{coupon_id}", coupon)
 
     def delete_coupon(self, coupon_id: int) -> None:
         """
@@ -124,8 +169,7 @@ class Woo:
         :param coupon_id: id of the coupon
         :return: None
         """
-        response = self.api_object.delete(f"coupons/{coupon_id}")
-        _check_for_errors(response)
+        self._delete(f"coupons/{coupon_id}")
 
     def create_webhook(self, webhook: Webhook) -> Webhook:
         """
@@ -133,9 +177,7 @@ class Woo:
         :param webhook: Webhook object
         :return: the created webhook
         """
-        response = self.api_object.post("webhooks", data=webhook.model_dump())
-        _check_for_errors(response)
-        return Webhook.model_validate(response.json())
+        return self._post("webhooks", webhook)
 
     def get_webhook(self, webhook_id: int) -> Webhook | None:
         """
@@ -143,11 +185,7 @@ class Woo:
         :param webhook_id: id of the webhook
         :return:
         """
-        response = self.api_object.get(f"webhooks/{webhook_id}")
-        if response.status_code == 404:
-            return None
-        _check_for_errors(response)
-        return Webhook.model_validate(response.json())
+        return self._get(f"webhooks/{webhook_id}", Webhook)
 
     def delete_webhook(self, webhook_id: int, force: bool = False) -> None:
         """
@@ -156,10 +194,7 @@ class Woo:
         :param force: when True, the webhook will be permanently deleted
         :return: None
         """
-        response = self.api_object.delete(
-            f"webhooks/{webhook_id}", params={"force": force}
-        )
-        _check_for_errors(response)
+        return self._delete(f"webhooks/{webhook_id}", force=force)
 
     def list_webhooks(self,
                       context: ContextType = "view",
@@ -193,7 +228,7 @@ class Woo:
             "orderby": orderby,
             "status": status
         }
-        return self._get_all("webhooks", Webhook, **params)
+        return self._get_all("webhooks/", Webhook, **params)
 
     def update_webhook(self, webhook_id: int, webhook: Webhook) -> Webhook:
         """
@@ -202,9 +237,4 @@ class Woo:
         :param webhook_edit: edit object
         :return:
         """
-        response = self.api_object.put(
-            f"webhooks/{webhook_id}",
-            data=webhook.model_dump(exclude_unchanged=True),
-        )
-        _check_for_errors(response)
-        return Webhook.model_validate(response.json())
+        return self._put(f"webhooks/{webhook_id}", webhook)
