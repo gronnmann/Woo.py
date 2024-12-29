@@ -1,4 +1,5 @@
 import os
+import random
 
 import pytest
 from dotenv import load_dotenv
@@ -31,3 +32,8 @@ def woo() -> Woo:
         raise ValueError(f"Failed to connect to WooCommerce API: {e}")
 
     return Woo(api)
+
+
+@pytest.fixture(scope="session")
+def random_str() -> str:
+    return "".join([random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(4)])

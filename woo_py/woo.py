@@ -67,7 +67,9 @@ class Woo:
         _check_for_errors(response)
         return [base_class.model_validate(obj) for obj in response.json()]
 
-    def _post(self, endpoint: str, model: [BaseModel, ChangeDetectionMixin]) -> BaseModel:
+    def _post(
+        self, endpoint: str, model: [BaseModel, ChangeDetectionMixin]
+    ) -> BaseModel:
         """
         Posts an object to an endpoint.
 
@@ -99,7 +101,9 @@ class Woo:
 
         base_class = type(model)
 
-        logger.debug(f"Putting to {endpoint} with model {model.model_dump(exclude_unchanged=True)}")
+        logger.debug(
+            f"Putting to {endpoint} with model {model.model_dump(exclude_unchanged=True)}"
+        )
 
         response = self.api_object.put(
             endpoint, data=None, json=model.model_dump(exclude_unchanged=True)
@@ -155,22 +159,22 @@ class Woo:
         Lists all coupons.
         """
 
-        params = {
-            "context": context,
-            "page": page,
-            "per_page": per_page,
-            "search": search,
-            "after": after,
-            "before": before,
-            "exclude": exclude,
-            "include": include,
-            "offset": offset,
-            "order": order,
-            "orderby": orderby,
-            "code": code,
-        }
-
-        return self._get_all("coupons", Coupon, **params)
+        return self._get_all(
+            "coupons",
+            Coupon,
+            context=context,
+            page=page,
+            per_page=per_page,
+            search=search,
+            after=after,
+            before=before,
+            exclude=exclude,
+            include=include,
+            offset=offset,
+            order=order,
+            orderby=orderby,
+            code=code,
+        )
 
     def update_coupon(self, coupon_id: int, coupon: Coupon) -> Coupon:
         """
@@ -249,7 +253,22 @@ class Woo:
             "orderby": orderby,
             "status": status,
         }
-        return self._get_all("webhooks/", Webhook, **params)
+        return self._get_all(
+            "webhooks/",
+            Webhook,
+            context=context,
+            page=page,
+            per_page=per_page,
+            search=search,
+            after=after,
+            before=before,
+            exclude=exclude,
+            include=include,
+            offset=offset,
+            order=order,
+            orderby=orderby,
+            status=status,
+        )
 
     def update_webhook(self, webhook_id: int, webhook: Webhook) -> Webhook:
         """
@@ -304,21 +323,22 @@ class Woo:
         """
         Lists all customers
         """
-        params = {
-            "context": context,
-            "page": page,
-            "per_page": per_page,
-            "search": search,
-            "exclude": exclude,
-            "include": include,
-            "offset": offset,
-            "order": order,
-            "orderby": orderby,
-            "email": email,
-            "role": role,
-        }
 
-        return self._get_all("customers", Customer, **params)
+        return self._get_all(
+            "customers",
+            Customer,
+            context=context,
+            page=page,
+            per_page=per_page,
+            search=search,
+            exclude=exclude,
+            include=include,
+            offset=offset,
+            order=order,
+            orderby=orderby,
+            email=email,
+            role=role,
+        )
 
     def update_customer(self, customer_id: int, customer: Customer) -> BaseModel:
         """
@@ -329,7 +349,9 @@ class Woo:
         """
         return self._put(f"customers/{customer_id}", customer)
 
-    def delete_customer(self, customer_id: int, force: bool, reassign: int | None = None) -> None:
+    def delete_customer(
+        self, customer_id: int, force: bool, reassign: int | None = None
+    ) -> None:
         """
         Deletes a customer by its ID.
         :param customer_id: id of the customer

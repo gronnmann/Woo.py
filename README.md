@@ -4,15 +4,18 @@ A wrapper around the official [python WooCommerce library](https://github.com/wo
 Simplifies the process of making requests to the WooCommerce API by providing a more practical interface,
 using the official library together with pydantic models.
 
-Note that this is a work in progress, which I mostly update when I use the endpoints in my own projects.
-You are therefore not guaranteed that all endpoints are implemented, but I will try to keep it up to date.
-
+Note that this is very WIP and barely and endpoints are implemented.
+They are mostly added as I need them in other projects.
+You are welcome to contribute by adding more endpoints and models.
 ## Installation
 Clone the repo, then do:
 ```bash
 pip install ./Woo.py
 ```
 You can now import the package and use it in your code.
+
+## Known issues
+- The `list_XXX` methods give `401 Unauthorized` errors when trying to list resources. 
 
 ## Usage
 After installation, create an instance of the `API` object from the `WooCommerce` library.

@@ -1,13 +1,16 @@
+import random
+
 from woo_py.models.customer import Customer
 from woo_py.woo import Woo
 
 
-def test_customer_methods(woo: Woo):
+def test_customer_methods(woo: Woo, random_str: str):
     new_customer = Customer(
-        email="test@example.com",
+
+        email=f"test_{random_str}@example.com",
         first_name="Test",
         last_name="Customer",
-        username="testcustomer"
+        username=f"test_{random_str.lower()}"
     )
 
     created_customer = woo.create_customer(new_customer)
