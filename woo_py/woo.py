@@ -1,3 +1,5 @@
+import datetime
+
 from loguru import logger
 from pydantic import BaseModel
 from pydantic_changedetect import ChangeDetectionMixin
@@ -5,6 +7,7 @@ from requests import Response, HTTPError
 from woocommerce import API
 
 from woo_py.models.coupon import Coupon
+from woo_py.models.customer import Customer
 from woo_py.models.webhook import Webhook
 import typing as t
 
@@ -34,19 +37,23 @@ class Woo:
     def __init__(self, api_object: API) -> None:
         self.api_object = api_object
 
-    def _get(self, endpoint: str, base_class: t.Type[BaseModel], **params) -> BaseModel | None:
+    def _get(
+        self, endpoint: str, base_class: t.Type[BaseModel], **params
+    ) -> BaseModel | None:
         """
         Gets an object from an endpoint.
         :return parsed object or None if not found
         """
-
+        logger.debug(f"Getting {endpoint} with params {params}")
         response = self.api_object.get(endpoint, params=params)
         if response.status_code == 404:
             return None
         _check_for_errors(response)
         return base_class.model_validate(response.json())
 
-    def _get_all(self, endpoint: str, base_class: t.Type[BaseModel], **params) -> list[t.Any]:
+    def _get_all(
+        self, endpoint: str, base_class: t.Type[BaseModel], **params
+    ) -> list[t.Any]:
         """
         Gets all objects from an endpoint.
         """
@@ -54,11 +61,13 @@ class Woo:
         # delete all None params
         params = {k: v for k, v in params.items() if v is not None}
 
+        logger.debug(f"Getting all {endpoint} with params {params}")
+
         response = self.api_object.get(endpoint, params=params)
         _check_for_errors(response)
         return [base_class.model_validate(obj) for obj in response.json()]
 
-    def _post(self, endpoint: str, model: BaseModel) -> BaseModel:
+    def _post(self, endpoint: str, model: [BaseModel, ChangeDetectionMixin]) -> BaseModel:
         """
         Posts an object to an endpoint.
 
@@ -70,7 +79,11 @@ class Woo:
 
         base_class = type(model)
 
-        response = self.api_object.post(endpoint, data=None, json=model.model_dump())
+        dumped = model.model_dump(exclude_none=True)
+
+        logger.debug(f"Posting to {endpoint} with model {dumped}")
+
+        response = self.api_object.post(endpoint, data=None, json=dumped)
         _check_for_errors(response)
         return base_class.model_validate(response.json())
 
@@ -86,7 +99,11 @@ class Woo:
 
         base_class = type(model)
 
-        response = self.api_object.put(endpoint, data=None, json=model.model_dump(exclude_unchanged=True))
+        logger.debug(f"Putting to {endpoint} with model {model.model_dump(exclude_unchanged=True)}")
+
+        response = self.api_object.put(
+            endpoint, data=None, json=model.model_dump(exclude_unchanged=True)
+        )
         _check_for_errors(response)
         return base_class.model_validate(response.json())
 
@@ -98,6 +115,7 @@ class Woo:
         response = self.api_object.delete(endpoint, params=params)
         _check_for_errors(response)
 
+    # Coupons
     def create_coupon(self, coupon: Coupon):
         """
         Creates a coupon.
@@ -117,21 +135,21 @@ class Woo:
         return self._get(f"coupons/{coupon_id}", Coupon)
 
     def list_coupons(
-            self,
-            context: ContextType = "view",
-            page: int = 0,
-            per_page: int = 10,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int = 0,
-            order: OrderType = "asc",
-            orderby: t.Literal[
-                "date", "modified", "id", "include", "title", "slug"
-            ] = "date",
-            code: str | None = None,
+        self,
+        context: ContextType = "view",
+        page: int = 0,
+        per_page: int = 10,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int = 0,
+        order: OrderType = "asc",
+        orderby: t.Literal[
+            "date", "modified", "id", "include", "title", "slug"
+        ] = "date",
+        code: str | None = None,
     ) -> list[Coupon]:
         """
         Lists all coupons.
@@ -171,6 +189,8 @@ class Woo:
         """
         self._delete(f"coupons/{coupon_id}")
 
+    # Webhooks
+
     def create_webhook(self, webhook: Webhook) -> Webhook:
         """
         Creates a webhook.
@@ -196,20 +216,21 @@ class Woo:
         """
         return self._delete(f"webhooks/{webhook_id}", force=force)
 
-    def list_webhooks(self,
-                      context: ContextType = "view",
-                      page: int = 1,
-                      per_page: int = 10,
-                      search: str | None = None,
-                      after: str | None = None,
-                      before: str | None = None,
-                      exclude: list[int] | None = None,
-                      include: list[int] | None = None,
-                      offset: int | None = None,
-                      order: OrderType = "desc",
-                      orderby: t.Literal["date", "id", "title"] = "date",
-                      status: t.Literal["all", "active", "paused", "disabled", "all"] = "all"
-                      ) -> list[Webhook]:
+    def list_webhooks(
+        self,
+        context: ContextType = "view",
+        page: int = 1,
+        per_page: int = 10,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = "desc",
+        orderby: t.Literal["date", "id", "title"] = "date",
+        status: t.Literal["all", "active", "paused", "disabled", "all"] = "all",
+    ) -> list[Webhook]:
         """
         Lists all webhooks.
         :return: list of Webhook objects
@@ -226,7 +247,7 @@ class Woo:
             "offset": offset,
             "order": order,
             "orderby": orderby,
-            "status": status
+            "status": status,
         }
         return self._get_all("webhooks/", Webhook, **params)
 
@@ -238,3 +259,83 @@ class Woo:
         :return:
         """
         return self._put(f"webhooks/{webhook_id}", webhook)
+
+    # Customers
+
+    def create_customer(self, customer: Customer) -> BaseModel:
+        """
+        Creates a customer.
+        :param customer: Customer object
+        :return: the created customer
+        """
+        return self._post("customers", customer)
+
+    def get_customer(self, customer_id: int) -> BaseModel | None:
+        """
+        Gets a customer by its ID.
+        :param customer_id: id of the customer
+        :return:
+        """
+        return self._get(f"customers/{customer_id}", Customer)
+
+    def list_customers(
+        self,
+        context: ContextType = "view",
+        page: int = 1,
+        per_page: int = 10,
+        search: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = "asc",
+        orderby: t.Literal["id", "include", "name", "registered_date"] = "name",
+        email: str | None = None,
+        role: t.Literal[
+            "all",
+            "administrator",
+            "editor",
+            "author",
+            "contributor",
+            "subscriber",
+            "customer",
+            "shop_manager",
+        ] = "customer",
+    ) -> list[Customer]:
+        """
+        Lists all customers
+        """
+        params = {
+            "context": context,
+            "page": page,
+            "per_page": per_page,
+            "search": search,
+            "exclude": exclude,
+            "include": include,
+            "offset": offset,
+            "order": order,
+            "orderby": orderby,
+            "email": email,
+            "role": role,
+        }
+
+        return self._get_all("customers", Customer, **params)
+
+    def update_customer(self, customer_id: int, customer: Customer) -> BaseModel:
+        """
+        Updates a customer by its ID.
+        :param customer_id: id of the customer
+        :param customer: Customer object
+        :return:
+        """
+        return self._put(f"customers/{customer_id}", customer)
+
+    def delete_customer(self, customer_id: int, force: bool, reassign: int | None = None) -> None:
+        """
+        Deletes a customer by its ID.
+        :param customer_id: id of the customer
+        :param force: required to be True, as customer does not support trashing
+        :param reassign: id of the customer to reassign the customer's posts to
+        :return: None
+        """
+
+        self._delete(f"customers/{customer_id}")
