@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 from woo_py.models.coupon import Coupon
 from woo_py.models.customer import Customer
+from woo_py.models.tax_class import TaxClass
 from woo_py.models.webhook import Webhook
 import typing as t
 
@@ -39,21 +40,21 @@ class Woo:
         return self.api_object.get(f"coupons/{coupon_id}", Coupon)
 
     def list_coupons(
-        self,
-        context: ContextType = "view",
-        page: int = 1,
-        per_page: int = 10,
-        search: str | None = None,
-        after: str | None = None,
-        before: str | None = None,
-        exclude: list[int] | None = None,
-        include: list[int] | None = None,
-        offset: int = 0,
-        order: OrderType = "asc",
-        orderby: t.Literal[
-            "date", "modified", "id", "include", "title", "slug"
-        ] = "date",
-        code: str | None = None,
+            self,
+            context: ContextType = "view",
+            page: int = 1,
+            per_page: int = 10,
+            search: str | None = None,
+            after: str | None = None,
+            before: str | None = None,
+            exclude: list[int] | None = None,
+            include: list[int] | None = None,
+            offset: int = 0,
+            order: OrderType = "asc",
+            orderby: t.Literal[
+                "date", "modified", "id", "include", "title", "slug"
+            ] = "date",
+            code: str | None = None,
     ) -> list[Coupon]:
         """
         Lists all coupons.
@@ -121,19 +122,19 @@ class Woo:
         return self.api_object.delete(f"webhooks/{webhook_id}", force=force)
 
     def list_webhooks(
-        self,
-        context: ContextType = "view",
-        page: int = 1,
-        per_page: int = 10,
-        search: str | None = None,
-        after: str | None = None,
-        before: str | None = None,
-        exclude: list[int] | None = None,
-        include: list[int] | None = None,
-        offset: int | None = None,
-        order: OrderType = "desc",
-        orderby: t.Literal["date", "id", "title"] = "date",
-        status: t.Literal["all", "active", "paused", "disabled", "all"] = "all",
+            self,
+            context: ContextType = "view",
+            page: int = 1,
+            per_page: int = 10,
+            search: str | None = None,
+            after: str | None = None,
+            before: str | None = None,
+            exclude: list[int] | None = None,
+            include: list[int] | None = None,
+            offset: int | None = None,
+            order: OrderType = "desc",
+            orderby: t.Literal["date", "id", "title"] = "date",
+            status: t.Literal["all", "active", "paused", "disabled", "all"] = "all",
     ) -> list[Webhook]:
         """
         Lists all webhooks.
@@ -198,27 +199,27 @@ class Woo:
         return self.api_object.get(f"customers/{customer_id}", Customer)
 
     def list_customers(
-        self,
-        context: ContextType = "view",
-        page: int = 1,
-        per_page: int = 10,
-        search: str | None = None,
-        exclude: list[int] | None = None,
-        include: list[int] | None = None,
-        offset: int | None = None,
-        order: OrderType = "asc",
-        orderby: t.Literal["id", "include", "name", "registered_date"] = "name",
-        email: str | None = None,
-        role: t.Literal[
-            "all",
-            "administrator",
-            "editor",
-            "author",
-            "contributor",
-            "subscriber",
-            "customer",
-            "shop_manager",
-        ] = "customer",
+            self,
+            context: ContextType = "view",
+            page: int = 1,
+            per_page: int = 10,
+            search: str | None = None,
+            exclude: list[int] | None = None,
+            include: list[int] | None = None,
+            offset: int | None = None,
+            order: OrderType = "asc",
+            orderby: t.Literal["id", "include", "name", "registered_date"] = "name",
+            email: str | None = None,
+            role: t.Literal[
+                "all",
+                "administrator",
+                "editor",
+                "author",
+                "contributor",
+                "subscriber",
+                "customer",
+                "shop_manager",
+            ] = "customer",
     ) -> list[Customer]:
         """
         Lists all customers
@@ -250,7 +251,7 @@ class Woo:
         return self.api_object.put(f"customers/{customer_id}", customer)
 
     def delete_customer(
-        self, customer_id: int, force: bool, reassign: int | None = None
+            self, customer_id: int, force: bool, reassign: int | None = None
     ) -> None:
         """
         Deletes a customer by its ID.
@@ -263,3 +264,27 @@ class Woo:
         self.api_object.delete(
             f"customers/{customer_id}", force=force, reassign=reassign
         )
+
+    # Tax classes
+    def create_tax_class(self, tax_class: TaxClass) -> BaseModel:
+        """
+        Creates a tax class.
+        :param tax_class: Tax class object
+        :return: the created tax class
+        """
+        return self.api_object.post("taxes", tax_class)
+
+    def list_tax_classes(self) -> list[TaxClass]:
+        """
+        Lists all tax classes.
+        """
+        return self.api_object.get_all("taxes", TaxClass)
+
+    def delete_tax_class(self, slug: str, force: bool) -> None:
+        """
+        Deletes a tax class by its ID.
+        :param tax_class_id: id of the tax class
+        :param force: required to be True, as tax class does not support trashing
+        :return: None
+        """
+        self.api_object.delete(f"taxes/{tax_class_id}", force=force)

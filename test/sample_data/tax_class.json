@@ -1,0 +1,11 @@
+  {
+    "slug": "reduced-rate",
+    "name": "Reduced Rate",
+    "_links": {
+      "collection": [
+        {
+          "href": "https://example.com/wp-json/wc/v3/taxes/classes"
+        }
+      ]
+    }
+  }

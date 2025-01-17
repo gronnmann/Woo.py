@@ -102,6 +102,8 @@ class API:
     _query_string_auth: bool
     """Whenever to authenticate using url params (include consumer key and secret in URL). Requires HTTPS."""
 
+    timeout: float = 10.0
+
     def __init__(
         self,
         url: str,
@@ -109,6 +111,7 @@ class API:
         consumer_secret: str,
         query_string_auth: bool = False,
         verify_ssl: bool = True,
+        timeout: float = 10.0,
     ) -> None:
         """
         Initialize the API client.
@@ -118,6 +121,7 @@ class API:
         :param consumer_secret: The consumer secret.
         :param verify_ssl: Whenever to verify SSL certificate. Need to be set to False for self-signed certificates.
         :param query_string_auth: Whenever to authenticate using url params (include consumer key and secret in URL).
+        :param timeout: The timeout for requests.
         Requires HTTPS.
         """
 
@@ -131,6 +135,7 @@ class API:
             },
             base_url=urljoin(self._url, "/wp-json/wc/v3/"),
             verify=verify_ssl,
+            timeout=timeout,
         )
 
         self._consumer_key = consumer_key

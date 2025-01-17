@@ -9,6 +9,7 @@ from woo_py.models.order import Order
 from woo_py.models.order_note import OrderNote
 from woo_py.models.order_refund import OrderRefund
 from woo_py.models.product import Product
+from woo_py.models.tax_class import TaxClass
 from woo_py.models.webhook import Webhook
 
 
@@ -30,6 +31,7 @@ def _class_to_snake_case(obj):
         OrderRefund,
         Product,
         Webhook,
+        TaxClass,
     ],
 )
 def test_parse_sample_data(object: BaseModel):
