@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 name = "woo_py"
 version = "0.0.2"
 dependencies = [
-    "requests",
+    "httpx",
     "pydantic",
     "woocommerce",
     "pydantic-changedetect",
@@ -16,6 +16,11 @@ test = [
     "python-dotenv",
     "pytest",
     "requests_mock",
+]
+dev = [
+    "black",
+    "mypy",
+    "pylint",
 ]
 authors = [
   { name="gronnmann", email="gronnmannthecoder@gmail.com" },
