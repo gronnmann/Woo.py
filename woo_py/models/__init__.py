@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict
 class MetaData(BaseModel):
     id: int | None  # Meta ID (read-only)
     key: str | None  # Meta key
-    value: str | None  # Meta value
+    value: str | list[str] | None  # Meta value
 
 
 class ShippingAddress(BaseModel):
