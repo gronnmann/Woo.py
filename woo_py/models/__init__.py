@@ -88,9 +88,9 @@ class LineItem(BaseModel):
 
 
 class Dimensions(BaseModel):
-    length: str = None
-    width: str = None
-    height: str = None
+    length: str | None = None
+    width: str | None = None
+    height: str | None = None
 
 
 class DownloadProperties(BaseModel):

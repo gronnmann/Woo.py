@@ -1,12 +1,22 @@
 # Woo.py
-A wrapper around the official [python WooCommerce library](https://github.com/woocommerce/wc-api-python).
+An unofficial wrapper around the official [WooCommerce REST API](https://woocommerce.github.io/woocommerce-rest-api-docs/).
 
 Simplifies the process of making requests to the WooCommerce API by providing a more practical interface,
-using the official library together with pydantic models.
+using pydantic models together with the httpx library for more efficient resource access.
+
+Has several advantages over the official library:
+- Uses pydantic models to validate the data before sending it to the API, and to parse the response.
+- Provides a more practical interface for making requests to the API.
 
 Note that this is very WIP and barely and endpoints are implemented.
 They are mostly added as I need them in other projects.
 You are welcome to contribute by adding more endpoints and models.
+
+Currently, HTTP requests are not implemented yet. 
+You can however run it on self-signed certificated by setting the `verify_ssl` parameter of the `API` object to `False`.
+
+If you wish to run Woo on `localhost` with HTTPS, I recommend my [docker setup](https://github.com/gronnmann/wordpress_localhost_https). 
+
 ## Installation
 Clone the repo, then do:
 ```bash
@@ -14,20 +24,18 @@ pip install ./Woo.py
 ```
 You can now import the package and use it in your code.
 
-## Known issues
-- The `list_XXX` methods give `401 Unauthorized` errors when trying to list resources. 
-
 ## Usage
-After installation, create an instance of the `API` object from the `WooCommerce` library.
+After installation, create an instance of the `API` object. For details on parameters,
+see the `api.py` file (its all type hinted :) ).  
 After that, you can use the wrapper in the following way:
 ```python
-
+from woo_py.api import API
+from woo_py.woo import Woo
 
 wcapi = API(
     url="http://example.com",
     consumer_key="ck_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     consumer_secret="cs_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    version="wc/v3"
 )
 
 woo_py = Woo(wcapi)
@@ -35,9 +43,7 @@ woo_py = Woo(wcapi)
 You can then use the `woo_py` object to make requests to the WooCommerce API.
 For example, for POSTing webhooks:
 ```python
-from woocommerce import API
-from woo_py.woo import Woo
-
+from woo_py.models.webhook import Webhook, WebhookTopic
 
 webhook = Webhook(
     name="My webhook",
@@ -56,6 +62,7 @@ in `test/.env`:
 - `WC_URL` - The URL to your WooCommerce store
 - `WC_CONSUMER_KEY` - The consumer key for the WooCommerce API
 - `WC_CONSUMER_SECRET` - The consumer secret for the WooCommerce API
+- `VERIFY_SSL` - Whenever to verify the SSL certificate of the WooCommerce store. Set to `False` if you are using a self-signed certificate.
 
 After that, you can run the tests using `pytest`:
 ```bash

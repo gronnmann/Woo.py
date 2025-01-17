@@ -3,8 +3,8 @@ import random
 
 import pytest
 from dotenv import load_dotenv
-from woocommerce import API
 
+from woo_py.api import API
 from woo_py.woo import Woo
 
 
@@ -15,6 +15,7 @@ def woo() -> Woo:
     URL = os.getenv("WOO_URL")
     CONSUMER_KEY = os.getenv("WOO_CONSUMER_KEY")
     CONSUMER_SECRET = os.getenv("WOO_CONSUMER_SECRET")
+    VERIFY_SSL = os.getenv("VERIFY_SSL", "True").lower() == "true"
 
     if not URL or not CONSUMER_KEY or not CONSUMER_SECRET:
         raise ValueError("Missing WooCommerce credentials in .env file")
@@ -23,11 +24,11 @@ def woo() -> Woo:
         URL,
         CONSUMER_KEY,
         CONSUMER_SECRET,
+        verify_ssl=VERIFY_SSL,
     )
 
-    response = api.get("/")
     try:
-        response.raise_for_status()
+        response = api.get_json("/")
     except Exception as e:
         raise ValueError(f"Failed to connect to WooCommerce API: {e}")
 

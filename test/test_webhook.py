@@ -24,5 +24,5 @@ def test_all_methods(woo: Woo):
     assert len(all_webhooks) > 0
     assert updated_webhook.id in [wh.id for wh in all_webhooks]
 
-    woo.delete_webhook(updated_webhook.id)
+    woo.delete_webhook(updated_webhook.id, force=True)
     assert woo.get_webhook(updated_webhook.id) is None
