@@ -13,6 +13,8 @@ import typing as t
 from pydantic import BaseModel
 from pydantic_changedetect import ChangeDetectionMixin
 
+from oauth import OAuth
+
 
 def _is_ssl(url: str) -> bool:
     """Check if url use HTTPS.
@@ -199,7 +201,10 @@ class API:
                 auth = BasicAuth(self._consumer_key, self._consumer_secret)
         else:
             """Without SSL, only OAUTH url is supported"""
-            raise NotImplementedError("OAuth is not supported for non-HTTPS URLs.")
+            full_url = urljoin(self._url, endpoint)
+            oauth = OAuth(self._consumer_key, self._consumer_secret)
+            oauth_params = oauth.get_auth_params(method, full_url, kwargs)
+            kwargs.update(oauth_params)
 
         sent_data: str | dict[str, t.Any] | None = None
 
