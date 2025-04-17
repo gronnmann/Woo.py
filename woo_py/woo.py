@@ -825,7 +825,11 @@ class Woo:
         if date_max:
             params["date_max"] = date_max
             
-        return self.api_object.get("reports/sales", SalesReport, **params)
+        sales_report = self.api_object.get_all("reports/sales", SalesReport, **params)
+
+        if sales_report:
+            return sales_report[0]
+        return None
 
     def get_top_sellers_report(
         self,

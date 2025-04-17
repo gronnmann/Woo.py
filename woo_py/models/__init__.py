@@ -114,7 +114,5 @@ from woo_py.models.product_tag import ProductTag
 from woo_py.models.product_variation import ProductVariation, VariationStatus
 from woo_py.models.report import SalesReport, TopSellersReport
 from woo_py.models.setting import SettingOption
-from woo_py.models.shipping_method import ShippingMethod, ShippingMethodSetting
-from woo_py.models.shipping_zone import ShippingZone, ShippingZoneLocation
 from woo_py.models.tax_class import TaxClass
 from woo_py.models.webhook import Webhook, WebhookStatus, WebhookTopic

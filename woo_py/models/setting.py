@@ -10,6 +10,6 @@ class SettingOption(BaseModel):
     default: str | Dict[str, Any] | List[Any] | None = None
     tip: str | None = None
     placeholder: str | None = None
-    type: str
+    type: str | None = None
     options: Dict[str, str] | None = None
     group_id: str | None = None

@@ -11,8 +11,8 @@ class SalesReport(BaseModel):
     total_items: int | None = None
     total_tax: str | None = None
     total_shipping: str | None = None
-    total_refunds: str | None = None
-    total_discount: str | None = None
+    total_refunds: int | None = None
+    total_discount: int | None = None
     total_customers: int | None = None
 
 

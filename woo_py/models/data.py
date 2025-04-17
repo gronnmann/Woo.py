@@ -5,7 +5,7 @@ from typing import Dict, List, Optional
 class Country(BaseModel):
     code: str
     name: str
-    states: List[Dict[str, str]] | None = None
+    states: List[Dict[str, str | int]] | None = None
 
 
 class Currency(BaseModel):
