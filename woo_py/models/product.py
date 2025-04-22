@@ -86,7 +86,7 @@ class ProductAttribute(BaseModel):
     position: int
     visible: bool = False
     variation: bool = False
-    options: list[ProductDefaultAttribute]
+    options: list[ProductDefaultAttribute | str]
 
 
 class Product(ChangeDetectionMixin, BaseModel):

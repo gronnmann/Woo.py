@@ -33,7 +33,7 @@ class WebhookTopic(str, Enum):
 class Webhook(ChangeDetectionMixin, BaseModel):
     id: int | None = None
     name: str | None = None
-    status: WebhookStatus = WebhookStatus.ACTIVE
+    status: WebhookStatus
     topic: str | WebhookTopic
     resource: str | None = None
     event: str | None = None

@@ -1,12 +1,13 @@
 from enum import Enum
 
 from pydantic import BaseModel, ConfigDict
+import typing
 
 # Common models
 class MetaData(BaseModel):
     id: int | None  # Meta ID (read-only)
     key: str | None  # Meta key
-    value: str | list[str] | None  # Meta value
+    value: str | list[str] | dict[str, typing.Any] | None  # Meta value
 
 
 class ShippingAddress(BaseModel):

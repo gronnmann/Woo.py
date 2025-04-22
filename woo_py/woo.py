@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+from woo_py.models import Order
 from woo_py.models.coupon import Coupon
 from woo_py.models.customer import Customer
 from woo_py.models.product import Product
@@ -14,6 +15,7 @@ from woo_py.models.setting import SettingOption
 from woo_py.models.data import Country, Currency
 from woo_py.models.tax_class import TaxClass
 from woo_py.models.webhook import Webhook
+from woo_py.models.order_refund import OrderRefund
 import typing as t
 
 from woo_py.api import API
@@ -51,40 +53,45 @@ class Woo:
 
     def list_coupons(
             self,
-            context: ContextType = "view",
-            page: int = 1,
-            per_page: int = 10,
+            context: ContextType = None,
+            page: int = None,
+            per_page: int = None,
             search: str | None = None,
             after: str | None = None,
             before: str | None = None,
             exclude: list[int] | None = None,
             include: list[int] | None = None,
-            offset: int = 0,
-            order: OrderType = "asc",
+            offset: int = None,
+            order: OrderType = None,
             orderby: t.Literal[
                 "date", "modified", "id", "include", "title", "slug"
-            ] = "date",
+            ] = None,
             code: str | None = None,
     ) -> list[Coupon]:
         """
         Lists all coupons.
         """
+        params = {
+            "context": context,
+            "page": page,
+            "per_page": per_page,
+            "search": search,
+            "after": after,
+            "before": before,
+            "exclude": exclude,
+            "include": include,
+            "offset": offset,
+            "order": order,
+            "orderby": orderby,
+            "code": code,
+        }
+        # Remove None values
+        params = {k: v for k, v in params.items() if v is not None}
 
         return self.api_object.get_all(
             "coupons",
             Coupon,
-            context=context,
-            page=page,
-            per_page=per_page,
-            search=search,
-            after=after,
-            before=before,
-            exclude=exclude,
-            include=include,
-            offset=offset,
-            order=order,
-            orderby=orderby,
-            code=code,
+            **params
         )
 
     def update_coupon(self, coupon_id: int, coupon: Coupon) -> Coupon:
@@ -133,18 +140,18 @@ class Woo:
 
     def list_webhooks(
             self,
-            context: ContextType = "view",
-            page: int = 1,
-            per_page: int = 10,
+            context: ContextType = None,
+            page: int = None,
+            per_page: int = None,
             search: str | None = None,
             after: str | None = None,
             before: str | None = None,
             exclude: list[int] | None = None,
             include: list[int] | None = None,
             offset: int | None = None,
-            order: OrderType = "desc",
-            orderby: t.Literal["date", "id", "title"] = "date",
-            status: t.Literal["all", "active", "paused", "disabled", "all"] = "all",
+            order: OrderType = None,
+            orderby: t.Literal["date", "id", "title"] = None,
+            status: t.Literal["all", "active", "paused", "disabled", "all"] = None,
     ) -> list[Webhook]:
         """
         Lists all webhooks.
@@ -164,21 +171,13 @@ class Woo:
             "orderby": orderby,
             "status": status,
         }
+        # Remove None values
+        params = {k: v for k, v in params.items() if v is not None}
+        
         return self.api_object.get_all(
             "webhooks/",
             Webhook,
-            context=context,
-            page=page,
-            per_page=per_page,
-            search=search,
-            after=after,
-            before=before,
-            exclude=exclude,
-            include=include,
-            offset=offset,
-            order=order,
-            orderby=orderby,
-            status=status,
+            **params
         )
 
     def update_webhook(self, webhook_id: int, webhook: Webhook) -> Webhook:
@@ -210,15 +209,15 @@ class Woo:
 
     def list_customers(
             self,
-            context: ContextType = "view",
-            page: int = 1,
-            per_page: int = 10,
+            context: ContextType = None,
+            page: int = None,
+            per_page: int = None,
             search: str | None = None,
             exclude: list[int] | None = None,
             include: list[int] | None = None,
             offset: int | None = None,
-            order: OrderType = "asc",
-            orderby: t.Literal["id", "include", "name", "registered_date"] = "name",
+            order: OrderType = None,
+            orderby: t.Literal["id", "include", "name", "registered_date"] = None,
             email: str | None = None,
             role: t.Literal[
                 "all",
@@ -229,26 +228,31 @@ class Woo:
                 "subscriber",
                 "customer",
                 "shop_manager",
-            ] = "customer",
+            ] = None,
     ) -> list[Customer]:
         """
         Lists all customers
         """
+        params = {
+            "context": context,
+            "page": page,
+            "per_page": per_page,
+            "search": search,
+            "exclude": exclude,
+            "include": include,
+            "offset": offset,
+            "order": order,
+            "orderby": orderby,
+            "email": email,
+            "role": role,
+        }
+        # Remove None values
+        params = {k: v for k, v in params.items() if v is not None}
 
         return self.api_object.get_all(
             "customers",
             Customer,
-            context=context,
-            page=page,
-            per_page=per_page,
-            search=search,
-            exclude=exclude,
-            include=include,
-            offset=offset,
-            order=order,
-            orderby=orderby,
-            email=email,
-            role=role,
+            **params
         )
 
     def update_customer(self, customer_id: int, customer: Customer) -> BaseModel:
@@ -318,23 +322,23 @@ class Woo:
 
     def list_products(
             self,
-            context: ContextType = "view",
-            page: int = 1,
-            per_page: int = 10,
+            context: ContextType = None,
+            page: int = None,
+            per_page: int = None,
             search: str | None = None,
             after: str | None = None,
             before: str | None = None,
             exclude: list[int] | None = None,
             include: list[int] | None = None,
             offset: int | None = None,
-            order: OrderType = "desc",
+            order: OrderType = None,
             orderby: t.Literal[
                 "date", "id", "include", "title", "slug", "price", "popularity", "rating"
-            ] = "date",
+            ] = None,
             category: str | None = None,
             tag: str | None = None,
-            status: t.Literal["any", "draft", "pending", "private", "publish"] = "any",
-            type: t.Literal["simple", "grouped", "external", "variable"] = "simple",
+            status: t.Literal["any", "draft", "pending", "private", "publish"] = None,
+            type: t.Literal["simple", "grouped", "external", "variable"] = None,
             featured: bool | None = None,
             sku: str | None = None,
     ) -> list[Product]:
@@ -342,26 +346,32 @@ class Woo:
         Lists all products.
         :return: list of Product objects
         """
+        params = {
+            "context": context,
+            "page": page,
+            "per_page": per_page,
+            "search": search,
+            "after": after,
+            "before": before,
+            "exclude": exclude,
+            "include": include,
+            "offset": offset,
+            "order": order,
+            "orderby": orderby,
+            "category": category,
+            "tag": tag,
+            "status": status,
+            "type": type,
+            "featured": featured,
+            "sku": sku,
+        }
+        # Remove None values
+        params = {k: v for k, v in params.items() if v is not None}
+
         return self.api_object.get_all(
             "products",
             Product,
-            context=context,
-            page=page,
-            per_page=per_page,
-            search=search,
-            after=after,
-            before=before,
-            exclude=exclude,
-            include=include,
-            offset=offset,
-            order=order,
-            orderby=orderby,
-            category=category,
-            tag=tag,
-            status=status,
-            type=type,
-            featured=featured,
-            sku=sku,
+            **params
         )
 
     def update_product(self, product_id: int, product: Product) -> Product:
@@ -404,37 +414,43 @@ class Woo:
     def list_product_variations(
             self,
             product_id: int,
-            context: ContextType = "view",
-            page: int = 1,
-            per_page: int = 10,
+            context: ContextType = None,
+            page: int = None,
+            per_page: int = None,
             search: str | None = None,
             after: str | None = None,
             before: str | None = None,
             exclude: list[int] | None = None,
             include: list[int] | None = None,
             offset: int | None = None,
-            order: OrderType = "desc",
-            orderby: t.Literal["date", "id", "include", "title", "slug"] = "date",
+            order: OrderType = None,
+            orderby: t.Literal["date", "id", "include", "title", "slug"] = None,
     ) -> list[ProductVariation]:
         """
         Lists all variations for a product.
         :param product_id: id of the parent product
         :return: list of ProductVariation objects
         """
+        params = {
+            "context": context,
+            "page": page,
+            "per_page": per_page,
+            "search": search,
+            "after": after,
+            "before": before,
+            "exclude": exclude,
+            "include": include,
+            "offset": offset,
+            "order": order,
+            "orderby": orderby,
+        }
+        # Remove None values
+        params = {k: v for k, v in params.items() if v is not None}
+        
         return self.api_object.get_all(
             f"products/{product_id}/variations",
             ProductVariation,
-            context=context,
-            page=page,
-            per_page=per_page,
-            search=search,
-            after=after,
-            before=before,
-            exclude=exclude,
-            include=include,
-            offset=offset,
-            order=order,
-            orderby=orderby,
+            **params
         )
 
     def update_product_variation(
@@ -480,15 +496,15 @@ class Woo:
 
     def list_product_categories(
             self,
-            context: ContextType = "view",
-            page: int = 1,
-            per_page: int = 10,
+            context: ContextType = None,
+            page: int = None,
+            per_page: int = None,
             search: str | None = None,
             exclude: list[int] | None = None,
             include: list[int] | None = None,
-            order: OrderType = "asc",
-            orderby: t.Literal["id", "include", "name", "slug", "term_group", "description", "count"] = "name",
-            hide_empty: bool = False,
+            order: OrderType = None,
+            orderby: t.Literal["id", "include", "name", "slug", "term_group", "description", "count"] = None,
+            hide_empty: bool = None,
             parent: int | None = None,
             product: int | None = None,
             slug: str | None = None,
@@ -497,21 +513,27 @@ class Woo:
         Lists all product categories.
         :return: list of ProductCategory objects
         """
+        params = {
+            "context": context,
+            "page": page,
+            "per_page": per_page,
+            "search": search,
+            "exclude": exclude,
+            "include": include,
+            "order": order,
+            "orderby": orderby,
+            "hide_empty": hide_empty,
+            "parent": parent,
+            "product": product,
+            "slug": slug,
+        }
+        # Remove None values
+        params = {k: v for k, v in params.items() if v is not None}
+        
         return self.api_object.get_all(
             "products/categories",
             ProductCategory,
-            context=context,
-            page=page,
-            per_page=per_page,
-            search=search,
-            exclude=exclude,
-            include=include,
-            order=order,
-            orderby=orderby,
-            hide_empty=hide_empty,
-            parent=parent,
-            product=product,
-            slug=slug,
+            **params
         )
 
     def update_product_category(
@@ -553,16 +575,16 @@ class Woo:
 
     def list_product_tags(
             self,
-            context: ContextType = "view",
-            page: int = 1,
-            per_page: int = 10,
+            context: ContextType = None,
+            page: int = None,
+            per_page: int = None,
             search: str | None = None,
             exclude: list[int] | None = None,
             include: list[int] | None = None,
             offset: int | None = None,
-            order: OrderType = "asc",
-            orderby: t.Literal["id", "include", "name", "slug", "term_group", "description", "count"] = "name",
-            hide_empty: bool = False,
+            order: OrderType = None,
+            orderby: t.Literal["id", "include", "name", "slug", "term_group", "description", "count"] = None,
+            hide_empty: bool = None,
             product: int | None = None,
             slug: str | None = None,
     ) -> list[ProductTag]:
@@ -570,21 +592,27 @@ class Woo:
         Lists all product tags.
         :return: list of ProductTag objects
         """
+        params = {
+            "context": context,
+            "page": page,
+            "per_page": per_page,
+            "search": search,
+            "exclude": exclude,
+            "include": include,
+            "offset": offset,
+            "order": order,
+            "orderby": orderby,
+            "hide_empty": hide_empty,
+            "product": product,
+            "slug": slug,
+        }
+        # Remove None values
+        params = {k: v for k, v in params.items() if v is not None}
+        
         return self.api_object.get_all(
             "products/tags",
             ProductTag,
-            context=context,
-            page=page,
-            per_page=per_page,
-            search=search,
-            exclude=exclude,
-            include=include,
-            offset=offset,
-            order=order,
-            orderby=orderby,
-            hide_empty=hide_empty,
-            product=product,
-            slug=slug,
+            **params
         )
 
     def update_product_tag(self, tag_id: int, tag: ProductTag) -> ProductTag:
@@ -624,24 +652,30 @@ class Woo:
 
     def list_product_attributes(
             self,
-            context: ContextType = "view",
-            page: int = 1,
-            per_page: int = 10,
-            order: OrderType = "asc",
-            orderby: t.Literal["id", "name", "slug", "type", "order_by"] = "name",
+            context: ContextType = None,
+            page: int = None,
+            per_page: int = None,
+            order: OrderType = None,
+            orderby: t.Literal["id", "name", "slug", "type", "order_by"] = None,
     ) -> list[ProductAttribute]:
         """
         Lists all product attributes.
         :return: list of ProductAttribute objects
         """
+        params = {
+            "context": context,
+            "page": page,
+            "per_page": per_page,
+            "order": order,
+            "orderby": orderby,
+        }
+        # Remove None values
+        params = {k: v for k, v in params.items() if v is not None}
+        
         return self.api_object.get_all(
             "products/attributes",
             ProductAttribute,
-            context=context,
-            page=page,
-            per_page=per_page,
-            order=order,
-            orderby=orderby,
+            **params
         )
 
     def update_product_attribute(
@@ -683,44 +717,50 @@ class Woo:
 
     def list_product_reviews(
             self,
-            context: ContextType = "view",
-            page: int = 1,
-            per_page: int = 10,
+            context: ContextType = None,
+            page: int = None,
+            per_page: int = None,
             search: str | None = None,
             after: str | None = None,
             before: str | None = None,
             exclude: list[int] | None = None,
             include: list[int] | None = None,
             offset: int | None = None,
-            order: OrderType = "desc",
-            orderby: t.Literal["date", "date_gmt", "id", "include", "product", "rating"] = "date",
+            order: OrderType = None,
+            orderby: t.Literal["date", "date_gmt", "id", "include", "product", "rating"] = None,
             reviewer: str | None = None,
             reviewer_email: str | None = None,
             product: int | None = None,
-            status: t.Literal["approved", "hold", "spam", "unspam", "trash", "untrash"] = "approved",
+            status: t.Literal["approved", "hold", "spam", "unspam", "trash", "untrash"] = None,
     ) -> list[ProductReview]:
         """
         Lists all product reviews.
         :return: list of ProductReview objects
         """
+        params = {
+            "context": context,
+            "page": page,
+            "per_page": per_page,
+            "search": search,
+            "after": after,
+            "before": before,
+            "exclude": exclude,
+            "include": include,
+            "offset": offset,
+            "order": order,
+            "orderby": orderby,
+            "reviewer": reviewer,
+            "reviewer_email": reviewer_email,
+            "product": product,
+            "status": status,
+        }
+        # Remove None values
+        params = {k: v for k, v in params.items() if v is not None}
+        
         return self.api_object.get_all(
             "products/reviews",
             ProductReview,
-            context=context,
-            page=page,
-            per_page=per_page,
-            search=search,
-            after=after,
-            before=before,
-            exclude=exclude,
-            include=include,
-            offset=offset,
-            order=order,
-            orderby=orderby,
-            reviewer=reviewer,
-            reviewer_email=reviewer_email,
-            product=product,
-            status=status,
+            **params
         )
 
     def update_product_review(
@@ -889,3 +929,188 @@ class Woo:
         :return: updated SettingOption object
         """
         return self.api_object.put(f"settings/{group}/{id}", setting)
+
+    # Order Refunds
+    def create_order_refund(self, order_id: int, refund: OrderRefund) -> OrderRefund:
+        """
+        Creates a refund for a given order.
+        :param order_id: id of the order
+        :param refund: OrderRefund object with refund data
+        :return: the created OrderRefund object
+        """
+        return self.api_object.post(f"orders/{order_id}/refunds", refund)
+
+    def get_order_refund(self, order_id: int, refund_id: int) -> OrderRefund | None:
+        """
+        Retrieves a refund for a given order by its refund ID.
+        :param order_id: id of the order
+        :param refund_id: id of the refund
+        :return: OrderRefund object or None if not found
+        """
+        return self.api_object.get(f"orders/{order_id}/refunds/{refund_id}", OrderRefund)
+
+    def list_order_refunds(
+            self,
+            order_id: int,
+            context: str = None,
+            page: int = None,
+            per_page: int = None,
+            search: str = None,
+            after: str = None,
+            before: str = None,
+            exclude: list[int] = None,
+            include: list[int] = None,
+            offset: int = None,
+            order: str = None,
+            orderby: str = None,
+            dp: int = None,
+    ) -> list[OrderRefund]:
+        """
+        Lists all refunds for a given order.
+        :param order_id: id of the order
+        :param context: scope under which the request is made; determines fields present in the response
+        :param page: current page of the collection
+        :param per_page: maximum number of items returned per page
+        :param search: limit results to those matching a string
+        :param after: limit response to resources published after a given ISO8601-compliant date
+        :param before: limit response to resources published before a given ISO8601-compliant date
+        :param exclude: list of refund IDs to exclude from results
+        :param include: list of refund IDs to include in results
+        :param offset: offset the result set by a specific number of items
+        :param order: sort attribute order (asc or desc)
+        :param orderby: attribute by which to sort the collection
+        :param dp: number of decimal points to use for each resource
+        :return: list of OrderRefund objects
+        """
+        params = {
+            "context": context,
+            "page": page,
+            "per_page": per_page,
+            "search": search,
+            "after": after,
+            "before": before,
+            "exclude": exclude,
+            "include": include,
+            "offset": offset,
+            "order": order,
+            "orderby": orderby,
+            "dp": dp,
+        }
+        # Remove None values
+        params = {k: v for k, v in params.items() if v is not None}
+
+        return self.api_object.get_all(f"orders/{order_id}/refunds", OrderRefund, **params)
+
+    def delete_order_refund(self, order_id: int, refund_id: int, force: bool = None) -> None:
+        """
+        Deletes an order refund by its ID.
+        :param order_id: id of the order
+        :param refund_id: id of the refund
+        :param force: if True, the refund will be permanently deleted
+        :return: None
+        """
+        self.api_object.delete(f"orders/{order_id}/refunds/{refund_id}", force=force)
+
+    def create_order(self, order: Order) -> Order:
+        """
+        Creates an order.
+        :param order: Order object containing order details.
+        :return: The created Order object.
+        """
+        return self.api_object.post("orders", order)
+
+    def get_order(self, order_id: int) -> Order | None:
+        """
+        Retrieves an order by its ID.
+        :param order_id: The ID of the order.
+        :return: The Order object if found, otherwise None.
+        """
+        return self.api_object.get(f"orders/{order_id}", Order)
+
+    def list_orders(
+            self,
+            context: ContextType | None = None,
+            page: int | None = None,
+            per_page: int | None = None,
+            search: str | None = None,
+            after: str | None = None,
+            before: str | None = None,
+            modified_after: str | None = None,
+            modified_before: str | None = None,
+            dates_are_gmt: bool | None = None,
+            exclude: list[int] | None = None,
+            include: list[int] | None = None,
+            offset: int | None = None,
+            order: OrderType | None = None,
+            orderby: t.Literal["date", "modified", "id", "include", "title", "slug"] | None = None,
+            parent: list[int] | None = None,
+            parent_exclude: list[int] | None = None,
+            status: list[str] | None = None,
+            customer: int | None = None,
+            product: int | None = None,
+            dp: int | None = None,
+    ) -> list[Order]:
+        """
+        Lists orders with optional filtering.
+        Available parameters include:
+          - context: Scope under which the request is made (e.g. "view" or "edit").
+          - page: Current page of the collection.
+          - per_page: Maximum number of orders per page.
+          - search: Limit results to those matching a string.
+          - after / before: Limit results to orders created within a date range.
+          - modified_after / modified_before: Filter orders by modification dates.
+          - dates_are_gmt: Whether the dates are in GMT.
+          - exclude / include: Lists of order IDs to exclude/include.
+          - offset: Offset for the result set.
+          - order: Sorting order ("asc" or "desc").
+          - orderby: Attribute by which to sort orders.
+          - parent / parent_exclude: Filter by parent order IDs.
+          - status: Filter by order statuses.
+          - customer: Filter orders for a specific customer ID.
+          - product: Filter orders that contain a specific product ID.
+          - dp: Number of decimal points to include.
+        :return: A list of Order objects matching the filter criteria.
+        """
+        params = {
+            "context": context,
+            "page": page,
+            "per_page": per_page,
+            "search": search,
+            "after": after,
+            "before": before,
+            "modified_after": modified_after,
+            "modified_before": modified_before,
+            "dates_are_gmt": dates_are_gmt,
+            "exclude": exclude,
+            "include": include,
+            "offset": offset,
+            "order": order,
+            "orderby": orderby,
+            "parent": parent,
+            "parent_exclude": parent_exclude,
+            "status": status,
+            "customer": customer,
+            "product": product,
+            "dp": dp,
+        }
+        # Remove any parameters that are None.
+        params = {k: v for k, v in params.items() if v is not None}
+        return self.api_object.get_all("orders", Order, **params)
+
+    def update_order(self, order_id: int, order: Order) -> Order:
+        """
+        Updates an order by its ID.
+        :param order_id: The ID of the order to update.
+        :param order: Order object containing updated data.
+        :return: The updated Order object.
+        """
+        return self.api_object.put(f"orders/{order_id}", order)
+
+    def delete_order(self, order_id: int, force: bool = False) -> None:
+        """
+        Deletes an order by its ID.
+        :param order_id: The ID of the order.
+        :param force: If True, the order will be permanently deleted.
+        :return: None.
+        """
+        self.api_object.delete(f"orders/{order_id}", force=force)
