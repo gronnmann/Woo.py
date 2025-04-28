@@ -67,9 +67,12 @@ class Woo:
                 "date", "modified", "id", "include", "title", "slug"
             ] = None,
             code: str | None = None,
+            follow_pages: bool = False,
     ) -> list[Coupon]:
         """
         Lists all coupons.
+        
+        :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         """
         params = {
             "context": context,
@@ -91,6 +94,7 @@ class Woo:
         return self.api_object.get_all(
             "coupons",
             Coupon,
+            follow_pages=follow_pages,
             **params
         )
 
@@ -152,9 +156,11 @@ class Woo:
             order: OrderType = None,
             orderby: t.Literal["date", "id", "title"] = None,
             status: t.Literal["all", "active", "paused", "disabled", "all"] = None,
+            follow_pages: bool = False,
     ) -> list[Webhook]:
         """
         Lists all webhooks.
+        :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :return: list of Webhook objects
         """
         params = {
@@ -177,6 +183,7 @@ class Woo:
         return self.api_object.get_all(
             "webhooks/",
             Webhook,
+            follow_pages=follow_pages,
             **params
         )
 
@@ -229,9 +236,12 @@ class Woo:
                 "customer",
                 "shop_manager",
             ] = None,
+            follow_pages: bool = False,
     ) -> list[Customer]:
         """
         Lists all customers
+        
+        :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         """
         params = {
             "context": context,
@@ -252,6 +262,7 @@ class Woo:
         return self.api_object.get_all(
             "customers",
             Customer,
+            follow_pages=follow_pages,
             **params
         )
 
@@ -288,11 +299,13 @@ class Woo:
         """
         return self.api_object.post("taxes/classes", tax_class)
 
-    def list_tax_classes(self) -> list[TaxClass]:
+    def list_tax_classes(self, follow_pages: bool = False) -> list[TaxClass]:
         """
         Lists all tax classes.
+        
+        :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         """
-        return self.api_object.get_all("taxes/classes", TaxClass)
+        return self.api_object.get_all("taxes/classes", TaxClass, follow_pages=follow_pages)
 
     def delete_tax_class(self, slug: str, force: bool) -> None:
         """
@@ -341,9 +354,11 @@ class Woo:
             type: t.Literal["simple", "grouped", "external", "variable"] = None,
             featured: bool | None = None,
             sku: str | None = None,
+            follow_pages: bool = False,
     ) -> list[Product]:
         """
         Lists all products.
+        :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :return: list of Product objects
         """
         params = {
@@ -371,6 +386,7 @@ class Woo:
         return self.api_object.get_all(
             "products",
             Product,
+            follow_pages=follow_pages,
             **params
         )
 
@@ -425,10 +441,12 @@ class Woo:
             offset: int | None = None,
             order: OrderType = None,
             orderby: t.Literal["date", "id", "include", "title", "slug"] = None,
+            follow_pages: bool = False,
     ) -> list[ProductVariation]:
         """
         Lists all variations for a product.
         :param product_id: id of the parent product
+        :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :return: list of ProductVariation objects
         """
         params = {
@@ -450,6 +468,7 @@ class Woo:
         return self.api_object.get_all(
             f"products/{product_id}/variations",
             ProductVariation,
+            follow_pages=follow_pages,
             **params
         )
 
@@ -508,9 +527,11 @@ class Woo:
             parent: int | None = None,
             product: int | None = None,
             slug: str | None = None,
+            follow_pages: bool = False,
     ) -> list[ProductCategory]:
         """
         Lists all product categories.
+        :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :return: list of ProductCategory objects
         """
         params = {
@@ -533,6 +554,7 @@ class Woo:
         return self.api_object.get_all(
             "products/categories",
             ProductCategory,
+            follow_pages=follow_pages,
             **params
         )
 
@@ -587,9 +609,11 @@ class Woo:
             hide_empty: bool = None,
             product: int | None = None,
             slug: str | None = None,
+            follow_pages: bool = False,
     ) -> list[ProductTag]:
         """
         Lists all product tags.
+        :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :return: list of ProductTag objects
         """
         params = {
@@ -612,6 +636,7 @@ class Woo:
         return self.api_object.get_all(
             "products/tags",
             ProductTag,
+            follow_pages=follow_pages,
             **params
         )
 
@@ -657,9 +682,11 @@ class Woo:
             per_page: int = None,
             order: OrderType = None,
             orderby: t.Literal["id", "name", "slug", "type", "order_by"] = None,
+            follow_pages: bool = False,
     ) -> list[ProductAttribute]:
         """
         Lists all product attributes.
+        :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :return: list of ProductAttribute objects
         """
         params = {
@@ -675,6 +702,7 @@ class Woo:
         return self.api_object.get_all(
             "products/attributes",
             ProductAttribute,
+            follow_pages=follow_pages,
             **params
         )
 
@@ -732,9 +760,11 @@ class Woo:
             reviewer_email: str | None = None,
             product: int | None = None,
             status: t.Literal["approved", "hold", "spam", "unspam", "trash", "untrash"] = None,
+            follow_pages: bool = False,
     ) -> list[ProductReview]:
         """
         Lists all product reviews.
+        :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :return: list of ProductReview objects
         """
         params = {
@@ -760,6 +790,7 @@ class Woo:
         return self.api_object.get_all(
             "products/reviews",
             ProductReview,
+            follow_pages=follow_pages,
             **params
         )
 
@@ -784,14 +815,16 @@ class Woo:
         self.api_object.delete(f"products/reviews/{review_id}", force=force)
 
     # Payment Gateways
-    def list_payment_gateways(self) -> list[PaymentGateway]:
+    def list_payment_gateways(self, follow_pages: bool = False) -> list[PaymentGateway]:
         """
         Lists all payment gateways.
+        :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :return: list of PaymentGateway objects
         """
         return self.api_object.get_all(
             "payment_gateways",
             PaymentGateway,
+            follow_pages=follow_pages,
         )
 
     def get_payment_gateway(self, gateway_id: str) -> PaymentGateway | None:
@@ -815,12 +848,13 @@ class Woo:
 
 
     # Data endpoints
-    def get_countries(self) -> list[Country]:
+    def get_countries(self, follow_pages: bool = False) -> list[Country]:
         """
         Gets all countries.
+        :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :return: list of Country objects
         """
-        return self.api_object.get_all("data/countries", Country)
+        return self.api_object.get_all("data/countries", Country, follow_pages=follow_pages)
 
     def get_country(self, country_code: str) -> Country | None:
         """
@@ -830,12 +864,13 @@ class Woo:
         """
         return self.api_object.get(f"data/countries/{country_code}", Country)
 
-    def get_currencies(self) -> list[Currency]:
+    def get_currencies(self, follow_pages: bool = False) -> list[Currency]:
         """
         Gets all currencies.
+        :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :return: list of Currency objects
         """
-        return self.api_object.get_all("data/currencies", Currency)
+        return self.api_object.get_all("data/currencies", Currency, follow_pages=follow_pages)
 
     def get_currency(self, currency_code: str) -> Currency | None:
         """
@@ -964,6 +999,7 @@ class Woo:
             order: str = None,
             orderby: str = None,
             dp: int = None,
+            follow_pages: bool = False,
     ) -> list[OrderRefund]:
         """
         Lists all refunds for a given order.
@@ -980,6 +1016,7 @@ class Woo:
         :param order: sort attribute order (asc or desc)
         :param orderby: attribute by which to sort the collection
         :param dp: number of decimal points to use for each resource
+        :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :return: list of OrderRefund objects
         """
         params = {
@@ -999,7 +1036,7 @@ class Woo:
         # Remove None values
         params = {k: v for k, v in params.items() if v is not None}
 
-        return self.api_object.get_all(f"orders/{order_id}/refunds", OrderRefund, **params)
+        return self.api_object.get_all(f"orders/{order_id}/refunds", OrderRefund, follow_pages=follow_pages, **params)
 
     def delete_order_refund(self, order_id: int, refund_id: int, force: bool = None) -> None:
         """
@@ -1049,6 +1086,7 @@ class Woo:
             customer: int | None = None,
             product: int | None = None,
             dp: int | None = None,
+            follow_pages: bool = False,
     ) -> list[Order]:
         """
         Lists orders with optional filtering.
@@ -1069,6 +1107,7 @@ class Woo:
           - customer: Filter orders for a specific customer ID.
           - product: Filter orders that contain a specific product ID.
           - dp: Number of decimal points to include.
+          - follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :return: A list of Order objects matching the filter criteria.
         """
         params = {
@@ -1095,7 +1134,7 @@ class Woo:
         }
         # Remove any parameters that are None.
         params = {k: v for k, v in params.items() if v is not None}
-        return self.api_object.get_all("orders", Order, **params)
+        return self.api_object.get_all("orders", Order, follow_pages=follow_pages, **params)
 
     def update_order(self, order_id: int, order: Order) -> Order:
         """

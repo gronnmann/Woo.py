@@ -181,6 +181,11 @@ class API:
 
         kwargs = kwargs or {}
 
+        # Convert list parameters to comma-separated strings
+        for key, value in list(kwargs.items()):
+            if isinstance(value, list):
+                kwargs[key] = ','.join(str(item) for item in value)
+
         # Delete None kwargs
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
@@ -273,20 +278,60 @@ class API:
         return expected_model.model_validate(response)
 
     def get_all(
-        self, endpoint: str, expected_model: t.Type[T], **kwargs: URLParams
+        self, endpoint: str, expected_model: t.Type[T], follow_pages: bool = False, **kwargs: URLParams
     ) -> list[T]:
         """
         Get all models from the API.
 
         :param endpoint: The endpoint to request.
         :param expected_model: The model to expect.
+        :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :param kwargs: Additional keyword arguments.
         :return: The models.
         """
-
-        response = self.get_json(endpoint, **kwargs)
-
-        return [expected_model.model_validate(item) for item in response]
+        if not follow_pages:
+            response = self.get_json(endpoint, **kwargs)
+            return [expected_model.model_validate(item) for item in response]
+            
+        # Follow pagination
+        all_items = []
+        current_page = 1
+        
+        # Make sure we're not overriding an existing page parameter
+        if "page" in kwargs:
+            current_page = int(kwargs["page"])
+            
+        # Create a copy of kwargs to modify for pagination
+        page_kwargs = dict(kwargs)
+        
+        while True:
+            page_kwargs["page"] = current_page
+            
+            # Make the request for the current page
+            response = self._request(endpoint, "get", None, **page_kwargs)
+            
+            # Add items from the current page
+            items = response.json()
+            if not items:
+                break
+                
+            all_items.extend(items)
+            
+            # Check if there are more pages using the Link header
+            if "Link" not in response.headers:
+                break
+                
+            # Check if there's a "next" relation in the Link header
+            link_header = response.headers["Link"]
+            if 'rel="next"' not in link_header:
+                break
+                
+            # Move to the next page
+            current_page += 1
+            
+            logger.debug(f"Following pagination to page {current_page}")
+            
+        return [expected_model.model_validate(item) for item in all_items]
 
     def post(self, endpoint: str, data: T, **kwargs: URLParams) -> T:
         """
