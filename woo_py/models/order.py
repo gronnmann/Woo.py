@@ -24,6 +24,7 @@ class OrderStatus(str, Enum):
     REFUNDED = "refunded"
     FAILED = "failed"
     TRASH = "trash"
+    CHECKOUT_DRAFT = "checkout-draft"
 
 
 class CouponLine(BaseModel):
