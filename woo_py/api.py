@@ -69,8 +69,6 @@ def parse_link_header(link_header: str) -> dict[str, str]:
 class PaginatedResponse(t.Generic[T]):
     """
     A response from the WooCommerce API that includes pagination metadata.
-
-    :param metadata: The pagination metadata from the response.
     """
 
     items: list[T]
@@ -389,7 +387,6 @@ class API:
         **kwargs: URLParams,
     ) -> PaginatedResponse[T]: ...
 
-
     def get_all(
         self,
         endpoint: str,
@@ -417,7 +414,9 @@ class API:
             items = [expected_model.model_validate(item) for item in response.json()]
 
             if include_metadata:
-                return PaginatedResponse.from_response(items, response.headers, current_page=page)
+                return PaginatedResponse.from_response(
+                    items, response.headers, current_page=page
+                )
             return items
 
         # Follow pagination
