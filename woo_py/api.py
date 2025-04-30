@@ -3,6 +3,8 @@ Package for handling requests to the WOO API.
 """
 
 import json
+import re
+from dataclasses import dataclass
 from urllib.parse import urljoin, urlparse
 
 import httpx
@@ -42,6 +44,78 @@ URLParams = (
     | list[float]
     | list[bool]
 )
+
+
+def parse_link_header(link_header: str) -> dict[str, str]:
+    """
+    Parses an RFC 5988 Link header and returns a dictionary mapping rels to URLs.
+    Example: Link: <https://api.example.com?page=2>; rel="next"
+    """
+    links = {}
+    if not link_header:
+        return links
+
+    # Split into individual link parts
+    parts = link_header.split(",")
+    for part in parts:
+        match = re.match(r'\s*<([^>]+)>;\s*rel="([^"]+)"', part)
+        if match:
+            url, rel = match.groups()
+            links[rel] = url
+    return links
+
+
+@dataclass
+class PaginatedResponse(t.Generic[T]):
+    """
+    A response from the WooCommerce API that includes pagination metadata.
+
+    :param metadata: The pagination metadata from the response.
+    """
+
+    items: list[T]
+    """Actual items returned by the API."""
+
+    total: int | None = None
+    """Total number of items (NOT PAGES)."""
+
+    total_pages: int | None = None
+    """Total number of pages."""
+
+    current_page: int | None = None
+    """Current page."""
+
+    next_page_url: str | None = None
+    """URL for the next page."""
+
+    previous_page_url: str | None = None
+    """URL for the previous page."""
+
+    first_page_url: str | None = None
+    """URL for the first page."""
+
+    last_page_url: str | None = None
+    """URL for the last page."""
+
+    @classmethod
+    def from_response(
+        cls, data: list[T], headers: dict[str, str], current_page: int | None = None
+    ) -> "PaginatedResponse[T]":
+        total = int(headers.get("X-WP-Total", 0))
+        total_pages = int(headers.get("X-WP-TotalPages", 0))
+
+        links = parse_link_header(headers.get("Link", ""))
+
+        return cls(
+            items=data,
+            total=total,
+            total_pages=total_pages,
+            current_page=current_page,
+            next_page_url=links.get("next"),
+            previous_page_url=links.get("prev"),
+            first_page_url=links.get("first"),
+            last_page_url=links.get("last"),
+        )
 
 
 def _parse_woo_error_json(response: httpx.Response) -> str:
@@ -186,7 +260,7 @@ class API:
         # Convert list parameters to comma-separated strings
         for key, value in list(kwargs.items()):
             if isinstance(value, list):
-                kwargs[key] = ','.join(str(item) for item in value)
+                kwargs[key] = ",".join(str(item) for item in value)
 
         # Delete None kwargs
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
@@ -282,60 +356,93 @@ class API:
 
         return expected_model.model_validate(response)
 
+    @t.overload
     def get_all(
-        self, endpoint: str, expected_model: t.Type[T], follow_pages: bool = False, **kwargs: URLParams
-    ) -> list[T]:
+        self,
+        endpoint: str,
+        expected_model: t.Type[T],
+        *,
+        follow_pages: t.Literal[True],
+        include_metadata: t.Literal[False] = False,
+        **kwargs: URLParams,
+    ) -> list[T]: ...
+
+    @t.overload
+    def get_all(
+        self,
+        endpoint: str,
+        expected_model: t.Type[T],
+        *,
+        follow_pages: t.Literal[False] = False,
+        include_metadata: t.Literal[False],
+        **kwargs: URLParams,
+    ) -> list[T]: ...
+
+    @t.overload
+    def get_all(
+        self,
+        endpoint: str,
+        expected_model: t.Type[T],
+        *,
+        follow_pages: t.Literal[False] = False,
+        include_metadata: t.Literal[True],
+        **kwargs: URLParams,
+    ) -> PaginatedResponse[T]: ...
+
+
+    def get_all(
+        self,
+        endpoint: str,
+        expected_model: t.Type[T],
+        *,
+        follow_pages: bool = False,
+        include_metadata: bool = False,
+        **kwargs: URLParams,
+    ) -> list[T] | PaginatedResponse[T]:
         """
         Get all models from the API.
 
         :param endpoint: The endpoint to request.
         :param expected_model: The model to expect.
-        :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
-        :param kwargs: Additional keyword arguments.
-        :return: The models.
+        :param follow_pages: Whether to automatically follow pagination and get all pages.
+        :param include_metadata: If True, returns PaginatedResponse instead of plain list.
+        :param kwargs: Additional query parameters like page, per_page, etc.
         """
+        if follow_pages and include_metadata:
+            raise ValueError("Cannot use follow_pages=True with include_metadata=True")
+
         if not follow_pages:
-            response = self.get_json(endpoint, **kwargs)
-            return [expected_model.model_validate(item) for item in response]
-            
+            page = int(kwargs.get("page", 1))
+            response = self._request(endpoint, "get", None, **kwargs)
+            items = [expected_model.model_validate(item) for item in response.json()]
+
+            if include_metadata:
+                return PaginatedResponse.from_response(items, response.headers, current_page=page)
+            return items
+
         # Follow pagination
         all_items = []
-        current_page = 1
-        
-        # Make sure we're not overriding an existing page parameter
-        if "page" in kwargs:
-            current_page = int(kwargs["page"])
-            
-        # Create a copy of kwargs to modify for pagination
+        current_page = int(kwargs.get("page", 1))
         page_kwargs = dict(kwargs)
-        
+
         while True:
             page_kwargs["page"] = current_page
-            
-            # Make the request for the current page
             response = self._request(endpoint, "get", None, **page_kwargs)
-            
-            # Add items from the current page
-            items = response.json()
-            if not items:
+            page_items = response.json()
+
+            if not page_items:
                 break
-                
-            all_items.extend(items)
-            
-            # Check if there are more pages using the Link header
-            if "Link" not in response.headers:
-                break
-                
-            # Check if there's a "next" relation in the Link header
-            link_header = response.headers["Link"]
+
+            all_items.extend(page_items)
+
+            # Stop if no next page in Link header
+            link_header = response.headers.get("Link", "")
             if 'rel="next"' not in link_header:
                 break
-                
-            # Move to the next page
+
             current_page += 1
-            
             logger.debug(f"Following pagination to page {current_page}")
-            
+
         return [expected_model.model_validate(item) for item in all_items]
 
     def post(self, endpoint: str, data: T, **kwargs: URLParams) -> T:
