@@ -56,6 +56,33 @@ woo_py.create_webhook(webhook)
 Take a look at the `woo.py` file to see all the available methods, and in the `models` folder for 
 the defined models. 
 These correspond to the ones found [here](https://woocommerce.github.io/woocommerce-rest-api-docs/)
+
+### Paginated responses
+All `list_xxx` methods often contain paginated content. By default, the API will return the first page.
+You can use `follow_pages=True` to get all pages.
+
+This will return a list of all items in the response.
+
+If you for some reason need the pagination metadata, you can use `return_metadata=True`.
+
+In that case, the response will be a `PaginatedResponse[type]`, where the objects are available under
+`paginated_response.items`, and the metadata is available in the model.
+
+Examples:
+```python
+# Get all orders in first page
+orders = woo.list_orders() # type: list[Order]
+
+# Get all orders in all pages
+orders = woo.list_orders(follow_pages=True) # type: list[Order] 
+
+# Get all orders in first page, including paging metadata
+orders_page_metadata = woo.list_orders(return_metadata=True) # type: PaginatedResponse[Order]
+orders = orders_page_metadata.items # type: list[Order]
+
+```
+
+
 # Running tests
 To run the tests, you need to have a WooCommerce store running, and set the following environment variables
 in `test/.env`:
