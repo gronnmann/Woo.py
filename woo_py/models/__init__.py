@@ -3,6 +3,7 @@ from enum import Enum
 from pydantic import BaseModel, ConfigDict
 import typing
 
+
 # Common models
 class MetaData(BaseModel):
     id: int | None  # Meta ID (read-only)
@@ -99,6 +100,7 @@ class DownloadProperties(BaseModel):
     name: str
     file: str
 
+
 # Import all models
 from woo_py.models.coupon import Coupon
 from woo_py.models.customer import Customer
@@ -107,8 +109,18 @@ from woo_py.models.order import Order, OrderStatus
 from woo_py.models.order_note import OrderNote
 from woo_py.models.order_refund import OrderRefund
 from woo_py.models.payment_gateway import PaymentGateway, PaymentGatewaySetting
-from woo_py.models.product import Product, ProductType, ProductStatus, ProductCategory as ProductCategoryRef, ProductTag as ProductTagRef
-from woo_py.models.product_attribute import ProductAttribute, AttributeType, AttributeOrderBy
+from woo_py.models.product import (
+    Product,
+    ProductType,
+    ProductStatus,
+    ProductCategory as ProductCategoryRef,
+    ProductTag as ProductTagRef,
+)
+from woo_py.models.product_attribute import (
+    ProductAttribute,
+    AttributeType,
+    AttributeOrderBy,
+)
 from woo_py.models.product_category import ProductCategory, ProductCategoryImage
 from woo_py.models.product_review import ProductReview, ReviewStatus
 from woo_py.models.product_tag import ProductTag

@@ -15,6 +15,7 @@ from woo_py.models.report import SalesReport, TopSellersReport
 from woo_py.models.setting import SettingOption
 from woo_py.models.data import Country, Currency
 from woo_py.models.tax_class import TaxClass
+from woo_py.models.tax_rate import TaxRate
 from woo_py.models.webhook import Webhook
 from woo_py.models.order_refund import OrderRefund
 
@@ -50,102 +51,94 @@ class Woo:
         :return:
         """
         return self.api_object.get(f"coupons/{coupon_id}", Coupon)
-    
+
     @t.overload
     def list_coupons(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int = None,
-            order: OrderType = None,
-            orderby: t.Literal[
-                "date", "modified", "id", "include", "title", "slug"
-            ] = None,
-            code: str | None = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[True],
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int = None,
+        order: OrderType = None,
+        orderby: t.Literal["date", "modified", "id", "include", "title", "slug"] = None,
+        code: str | None = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[True],
     ) -> PaginatedResponse[Coupon]: ...
-    
+
     @t.overload
     def list_coupons(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int = None,
-            order: OrderType = None,
-            orderby: t.Literal[
-                "date", "modified", "id", "include", "title", "slug"
-            ] = None,
-            code: str | None = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[False] = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int = None,
+        order: OrderType = None,
+        orderby: t.Literal["date", "modified", "id", "include", "title", "slug"] = None,
+        code: str | None = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[False] = False,
     ) -> list[Coupon]: ...
-    
+
     @t.overload
     def list_coupons(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int = None,
-            order: OrderType = None,
-            orderby: t.Literal[
-                "date", "modified", "id", "include", "title", "slug"
-            ] = None,
-            code: str | None = None,
-            *,
-            follow_pages: t.Literal[True],
-            return_metadata: t.Literal[False] = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int = None,
+        order: OrderType = None,
+        orderby: t.Literal["date", "modified", "id", "include", "title", "slug"] = None,
+        code: str | None = None,
+        *,
+        follow_pages: t.Literal[True],
+        return_metadata: t.Literal[False] = False,
     ) -> list[Coupon]: ...
-    
+
     def list_coupons(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int = None,
-            order: OrderType = None,
-            orderby: t.Literal[
-                "date", "modified", "id", "include", "title", "slug"
-            ] = None,
-            code: str | None = None,
-            follow_pages: bool = False,
-            return_metadata: bool = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int = None,
+        order: OrderType = None,
+        orderby: t.Literal["date", "modified", "id", "include", "title", "slug"] = None,
+        code: str | None = None,
+        follow_pages: bool = False,
+        return_metadata: bool = False,
     ) -> list[Coupon] | PaginatedResponse[Coupon]:
         """
         Lists all coupons.
-        
+
         :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :param return_metadata: If True, returns a PaginatedResponse with metadata instead of just a list. Cannot be used with follow_pages=True.
         :return: A list of Coupon objects or a PaginatedResponse containing the list and pagination metadata.
         """
         if follow_pages and return_metadata:
             raise ValueError("Cannot use follow_pages=True with return_metadata=True")
-            
+
         params = {
             "context": context,
             "page": page,
@@ -168,7 +161,7 @@ class Woo:
             Coupon,
             follow_pages=follow_pages,
             include_metadata=return_metadata,
-            **params
+            **params,
         )
 
     def update_coupon(self, coupon_id: int, coupon: Coupon) -> Coupon:
@@ -214,94 +207,94 @@ class Woo:
         :return: None
         """
         return self.api_object.delete(f"webhooks/{webhook_id}", force=force)
-    
+
     @t.overload
     def list_webhooks(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["date", "id", "title"] = None,
-            status: t.Literal["all", "active", "paused", "disabled", "all"] = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[True],
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal["date", "id", "title"] = None,
+        status: t.Literal["all", "active", "paused", "disabled", "all"] = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[True],
     ) -> PaginatedResponse[Webhook]: ...
-    
+
     @t.overload
     def list_webhooks(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["date", "id", "title"] = None,
-            status: t.Literal["all", "active", "paused", "disabled", "all"] = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[False] = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal["date", "id", "title"] = None,
+        status: t.Literal["all", "active", "paused", "disabled", "all"] = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[False] = False,
     ) -> list[Webhook]: ...
-    
+
     @t.overload
     def list_webhooks(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["date", "id", "title"] = None,
-            status: t.Literal["all", "active", "paused", "disabled", "all"] = None,
-            *,
-            follow_pages: t.Literal[True],
-            return_metadata: t.Literal[False] = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal["date", "id", "title"] = None,
+        status: t.Literal["all", "active", "paused", "disabled", "all"] = None,
+        *,
+        follow_pages: t.Literal[True],
+        return_metadata: t.Literal[False] = False,
     ) -> list[Webhook]: ...
-    
+
     def list_webhooks(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["date", "id", "title"] = None,
-            status: t.Literal["all", "active", "paused", "disabled", "all"] = None,
-            follow_pages: bool = False,
-            return_metadata: bool = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal["date", "id", "title"] = None,
+        status: t.Literal["all", "active", "paused", "disabled", "all"] = None,
+        follow_pages: bool = False,
+        return_metadata: bool = False,
     ) -> list[Webhook] | PaginatedResponse[Webhook]:
         """
         Lists all webhooks.
-        
+
         :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :param return_metadata: If True, returns a PaginatedResponse with metadata instead of just a list. Cannot be used with follow_pages=True.
         :return: A list of Webhook objects or a PaginatedResponse containing the list and pagination metadata.
         """
         if follow_pages and return_metadata:
             raise ValueError("Cannot use follow_pages=True with return_metadata=True")
-            
+
         params = {
             "context": context,
             "page": page,
@@ -318,13 +311,13 @@ class Woo:
         }
         # Remove None values
         params = {k: v for k, v in params.items() if v is not None}
-        
+
         return self.api_object.get_all(
             "webhooks/",
             Webhook,
             follow_pages=follow_pages,
             include_metadata=return_metadata,
-            **params
+            **params,
         )
 
     def update_webhook(self, webhook_id: int, webhook: Webhook) -> Webhook:
@@ -353,126 +346,126 @@ class Woo:
         :return:
         """
         return self.api_object.get(f"customers/{customer_id}", Customer)
-    
+
     @t.overload
     def list_customers(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["id", "include", "name", "registered_date"] = None,
-            email: str | None = None,
-            role: t.Literal[
-                "all",
-                "administrator",
-                "editor",
-                "author",
-                "contributor",
-                "subscriber",
-                "customer",
-                "shop_manager",
-            ] = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[True],
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal["id", "include", "name", "registered_date"] = None,
+        email: str | None = None,
+        role: t.Literal[
+            "all",
+            "administrator",
+            "editor",
+            "author",
+            "contributor",
+            "subscriber",
+            "customer",
+            "shop_manager",
+        ] = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[True],
     ) -> PaginatedResponse[Customer]: ...
-    
+
     @t.overload
     def list_customers(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["id", "include", "name", "registered_date"] = None,
-            email: str | None = None,
-            role: t.Literal[
-                "all",
-                "administrator",
-                "editor",
-                "author",
-                "contributor",
-                "subscriber",
-                "customer",
-                "shop_manager",
-            ] = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[False] = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal["id", "include", "name", "registered_date"] = None,
+        email: str | None = None,
+        role: t.Literal[
+            "all",
+            "administrator",
+            "editor",
+            "author",
+            "contributor",
+            "subscriber",
+            "customer",
+            "shop_manager",
+        ] = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[False] = False,
     ) -> list[Customer]: ...
-    
+
     @t.overload
     def list_customers(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["id", "include", "name", "registered_date"] = None,
-            email: str | None = None,
-            role: t.Literal[
-                "all",
-                "administrator",
-                "editor",
-                "author",
-                "contributor",
-                "subscriber",
-                "customer",
-                "shop_manager",
-            ] = None,
-            *,
-            follow_pages: t.Literal[True],
-            return_metadata: t.Literal[False] = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal["id", "include", "name", "registered_date"] = None,
+        email: str | None = None,
+        role: t.Literal[
+            "all",
+            "administrator",
+            "editor",
+            "author",
+            "contributor",
+            "subscriber",
+            "customer",
+            "shop_manager",
+        ] = None,
+        *,
+        follow_pages: t.Literal[True],
+        return_metadata: t.Literal[False] = False,
     ) -> list[Customer]: ...
-    
+
     def list_customers(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["id", "include", "name", "registered_date"] = None,
-            email: str | None = None,
-            role: t.Literal[
-                "all",
-                "administrator",
-                "editor",
-                "author",
-                "contributor",
-                "subscriber",
-                "customer",
-                "shop_manager",
-            ] = None,
-            follow_pages: bool = False,
-            return_metadata: bool = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal["id", "include", "name", "registered_date"] = None,
+        email: str | None = None,
+        role: t.Literal[
+            "all",
+            "administrator",
+            "editor",
+            "author",
+            "contributor",
+            "subscriber",
+            "customer",
+            "shop_manager",
+        ] = None,
+        follow_pages: bool = False,
+        return_metadata: bool = False,
     ) -> list[Customer] | PaginatedResponse[Customer]:
         """
         Lists all customers
-        
+
         :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :param return_metadata: If True, returns a PaginatedResponse with metadata instead of just a list. Cannot be used with follow_pages=True.
         :return: A list of Customer objects or a PaginatedResponse containing the list and pagination metadata.
         """
         if follow_pages and return_metadata:
             raise ValueError("Cannot use follow_pages=True with return_metadata=True")
-            
+
         params = {
             "context": context,
             "page": page,
@@ -494,7 +487,7 @@ class Woo:
             Customer,
             follow_pages=follow_pages,
             include_metadata=return_metadata,
-            **params
+            **params,
         )
 
     def update_customer(self, customer_id: int, customer: Customer) -> BaseModel:
@@ -507,7 +500,7 @@ class Woo:
         return self.api_object.put(f"customers/{customer_id}", customer)
 
     def delete_customer(
-            self, customer_id: int, force: bool, reassign: int | None = None
+        self, customer_id: int, force: bool, reassign: int | None = None
     ) -> None:
         """
         Deletes a customer by its ID.
@@ -529,7 +522,7 @@ class Woo:
         :return: the created tax class
         """
         return self.api_object.post("taxes/classes", tax_class)
-    
+
     @t.overload
     def list_tax_classes(
         self,
@@ -537,7 +530,7 @@ class Woo:
         follow_pages: t.Literal[False] = False,
         return_metadata: t.Literal[True],
     ) -> PaginatedResponse[TaxClass]: ...
-    
+
     @t.overload
     def list_tax_classes(
         self,
@@ -545,7 +538,7 @@ class Woo:
         follow_pages: t.Literal[False] = False,
         return_metadata: t.Literal[False] = False,
     ) -> list[TaxClass]: ...
-    
+
     @t.overload
     def list_tax_classes(
         self,
@@ -553,7 +546,7 @@ class Woo:
         follow_pages: t.Literal[True],
         return_metadata: t.Literal[False] = False,
     ) -> list[TaxClass]: ...
-    
+
     def list_tax_classes(
         self,
         follow_pages: bool = False,
@@ -561,19 +554,19 @@ class Woo:
     ) -> list[TaxClass] | PaginatedResponse[TaxClass]:
         """
         Lists all tax classes.
-        
+
         :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :param return_metadata: If True, returns a PaginatedResponse with metadata instead of just a list. Cannot be used with follow_pages=True.
         :return: A list of TaxClass objects or a PaginatedResponse containing the list and pagination metadata.
         """
         if follow_pages and return_metadata:
             raise ValueError("Cannot use follow_pages=True with return_metadata=True")
-            
+
         return self.api_object.get_all(
-            "taxes/classes", 
-            TaxClass, 
+            "taxes/classes",
+            TaxClass,
             follow_pages=follow_pages,
-            include_metadata=return_metadata
+            include_metadata=return_metadata,
         )
 
     def delete_tax_class(self, slug: str, force: bool) -> None:
@@ -584,6 +577,136 @@ class Woo:
         :return: None
         """
         self.api_object.delete(f"taxes/classes/{slug}", force=force)
+
+    # Tax rates
+    def create_tax_rate(self, tax_rate: TaxRate) -> TaxRate:
+        """
+        Creates a tax rate.
+        :param tax_rate: TaxRate object
+        :return: the created tax rate
+        """
+        return self.api_object.post("taxes", tax_rate)
+
+    def get_tax_rate(self, tax_rate_id: int) -> TaxRate | None:
+        """
+        Gets a tax rate by its ID.
+        :param tax_rate_id: id of the tax rate
+        :return: TaxRate object or None if not found
+        """
+        return self.api_object.get(f"taxes/{tax_rate_id}", TaxRate)
+
+    @t.overload
+    def list_tax_rates(
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal["id", "order", "priority"] = None,
+        class_: str | None = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[True],
+    ) -> PaginatedResponse[TaxRate]: ...
+
+    @t.overload
+    def list_tax_rates(
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal["id", "order", "priority"] = None,
+        class_: str | None = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[False] = False,
+    ) -> list[TaxRate]: ...
+
+    @t.overload
+    def list_tax_rates(
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal["id", "order", "priority"] = None,
+        class_: str | None = None,
+        *,
+        follow_pages: t.Literal[True],
+        return_metadata: t.Literal[False] = False,
+    ) -> list[TaxRate]: ...
+
+    def list_tax_rates(
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal["id", "order", "priority"] = None,
+        class_: str | None = None,
+        follow_pages: bool = False,
+        return_metadata: bool = False,
+    ) -> list[TaxRate] | PaginatedResponse[TaxRate]:
+        """
+        Lists all tax rates.
+
+        :param context: Scope under which the request is made; determines fields present in response.
+        :param page: Current page of the collection.
+        :param per_page: Maximum number of items to be returned in result set.
+        :param offset: Offset the result set by a specific number of items.
+        :param order: Order sort attribute ascending or descending.
+        :param orderby: Sort collection by object attribute.
+        :param class_: Retrieve only tax rates of this tax class.
+        :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
+        :param return_metadata: If True, returns a PaginatedResponse with metadata instead of just a list. Cannot be used with follow_pages=True.
+        :return: A list of TaxRate objects or a PaginatedResponse containing the list and pagination metadata.
+        """
+        if follow_pages and return_metadata:
+            raise ValueError("Cannot use follow_pages=True with return_metadata=True")
+
+        params = {
+            "context": context,
+            "page": page,
+            "per_page": per_page,
+            "offset": offset,
+            "order": order,
+            "orderby": orderby,
+            "class": class_,
+        }
+
+        # Remove None values
+        params = {k: v for k, v in params.items() if v is not None}
+
+        return self.api_object.get_all(
+            "taxes",
+            TaxRate,
+            follow_pages=follow_pages,
+            include_metadata=return_metadata,
+            **params,
+        )
+
+    def update_tax_rate(self, tax_rate_id: int, tax_rate: TaxRate) -> TaxRate:
+        """
+        Updates a tax rate by its ID.
+        :param tax_rate_id: id of the tax rate
+        :param tax_rate: TaxRate object with updates
+        :return: updated TaxRate object
+        """
+        return self.api_object.put(f"taxes/{tax_rate_id}", tax_rate)
+
+    def delete_tax_rate(self, tax_rate_id: int, force: bool = False) -> None:
+        """
+        Deletes a tax rate by its ID.
+        :param tax_rate_id: id of the tax rate
+        :param force: when True, the tax rate will be permanently deleted
+        :return: None
+        """
+        self.api_object.delete(f"taxes/{tax_rate_id}", force=force)
 
     # Products
     def create_product(self, product: Product) -> Product:
@@ -601,122 +724,122 @@ class Woo:
         :return: Product object or None if not found
         """
         return self.api_object.get(f"products/{product_id}", Product)
-    
+
     @t.overload
     def list_products(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal[
-                "date", "id", "include", "title", "slug", "price", "popularity", "rating"
-            ] = None,
-            category: str | None = None,
-            tag: str | None = None,
-            status: t.Literal["any", "draft", "pending", "private", "publish"] = None,
-            type: t.Literal["simple", "grouped", "external", "variable"] = None,
-            featured: bool | None = None,
-            sku: str | None = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[True],
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal[
+            "date", "id", "include", "title", "slug", "price", "popularity", "rating"
+        ] = None,
+        category: str | None = None,
+        tag: str | None = None,
+        status: t.Literal["any", "draft", "pending", "private", "publish"] = None,
+        type: t.Literal["simple", "grouped", "external", "variable"] = None,
+        featured: bool | None = None,
+        sku: str | None = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[True],
     ) -> PaginatedResponse[Product]: ...
-    
+
     @t.overload
     def list_products(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal[
-                "date", "id", "include", "title", "slug", "price", "popularity", "rating"
-            ] = None,
-            category: str | None = None,
-            tag: str | None = None,
-            status: t.Literal["any", "draft", "pending", "private", "publish"] = None,
-            type: t.Literal["simple", "grouped", "external", "variable"] = None,
-            featured: bool | None = None,
-            sku: str | None = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[False] = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal[
+            "date", "id", "include", "title", "slug", "price", "popularity", "rating"
+        ] = None,
+        category: str | None = None,
+        tag: str | None = None,
+        status: t.Literal["any", "draft", "pending", "private", "publish"] = None,
+        type: t.Literal["simple", "grouped", "external", "variable"] = None,
+        featured: bool | None = None,
+        sku: str | None = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[False] = False,
     ) -> list[Product]: ...
-    
+
     @t.overload
     def list_products(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal[
-                "date", "id", "include", "title", "slug", "price", "popularity", "rating"
-            ] = None,
-            category: str | None = None,
-            tag: str | None = None,
-            status: t.Literal["any", "draft", "pending", "private", "publish"] = None,
-            type: t.Literal["simple", "grouped", "external", "variable"] = None,
-            featured: bool | None = None,
-            sku: str | None = None,
-            *,
-            follow_pages: t.Literal[True],
-            return_metadata: t.Literal[False] = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal[
+            "date", "id", "include", "title", "slug", "price", "popularity", "rating"
+        ] = None,
+        category: str | None = None,
+        tag: str | None = None,
+        status: t.Literal["any", "draft", "pending", "private", "publish"] = None,
+        type: t.Literal["simple", "grouped", "external", "variable"] = None,
+        featured: bool | None = None,
+        sku: str | None = None,
+        *,
+        follow_pages: t.Literal[True],
+        return_metadata: t.Literal[False] = False,
     ) -> list[Product]: ...
-    
+
     def list_products(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal[
-                "date", "id", "include", "title", "slug", "price", "popularity", "rating"
-            ] = None,
-            category: str | None = None,
-            tag: str | None = None,
-            status: t.Literal["any", "draft", "pending", "private", "publish"] = None,
-            type: t.Literal["simple", "grouped", "external", "variable"] = None,
-            featured: bool | None = None,
-            sku: str | None = None,
-            follow_pages: bool = False,
-            return_metadata: bool = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal[
+            "date", "id", "include", "title", "slug", "price", "popularity", "rating"
+        ] = None,
+        category: str | None = None,
+        tag: str | None = None,
+        status: t.Literal["any", "draft", "pending", "private", "publish"] = None,
+        type: t.Literal["simple", "grouped", "external", "variable"] = None,
+        featured: bool | None = None,
+        sku: str | None = None,
+        follow_pages: bool = False,
+        return_metadata: bool = False,
     ) -> list[Product] | PaginatedResponse[Product]:
         """
         Lists all products.
-        
+
         :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :param return_metadata: If True, returns a PaginatedResponse with metadata instead of just a list. Cannot be used with follow_pages=True.
         :return: A list of Product objects or a PaginatedResponse containing the list and pagination metadata.
         """
         if follow_pages and return_metadata:
             raise ValueError("Cannot use follow_pages=True with return_metadata=True")
-            
+
         params = {
             "context": context,
             "page": page,
@@ -744,7 +867,7 @@ class Woo:
             Product,
             follow_pages=follow_pages,
             include_metadata=return_metadata,
-            **params
+            **params,
         )
 
     def update_product(self, product_id: int, product: Product) -> Product:
@@ -766,7 +889,9 @@ class Woo:
         self.api_object.delete(f"products/{product_id}", force=force)
 
     # Product Variations
-    def create_product_variation(self, product_id: int, variation: ProductVariation) -> ProductVariation:
+    def create_product_variation(
+        self, product_id: int, variation: ProductVariation
+    ) -> ProductVariation:
         """
         Creates a product variation.
         :param product_id: id of the parent product
@@ -775,95 +900,99 @@ class Woo:
         """
         return self.api_object.post(f"products/{product_id}/variations", variation)
 
-    def get_product_variation(self, product_id: int, variation_id: int) -> ProductVariation | None:
+    def get_product_variation(
+        self, product_id: int, variation_id: int
+    ) -> ProductVariation | None:
         """
         Gets a product variation by its ID.
         :param product_id: id of the parent product
         :param variation_id: id of the variation
         :return: ProductVariation object or None if not found
         """
-        return self.api_object.get(f"products/{product_id}/variations/{variation_id}", ProductVariation)
-    
+        return self.api_object.get(
+            f"products/{product_id}/variations/{variation_id}", ProductVariation
+        )
+
     @t.overload
     def list_product_variations(
-            self,
-            product_id: int,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["date", "id", "include", "title", "slug"] = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[True],
+        self,
+        product_id: int,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal["date", "id", "include", "title", "slug"] = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[True],
     ) -> PaginatedResponse[ProductVariation]: ...
-    
+
     @t.overload
     def list_product_variations(
-            self,
-            product_id: int,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["date", "id", "include", "title", "slug"] = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[False] = False,
+        self,
+        product_id: int,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal["date", "id", "include", "title", "slug"] = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[False] = False,
     ) -> list[ProductVariation]: ...
-    
+
     @t.overload
     def list_product_variations(
-            self,
-            product_id: int,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["date", "id", "include", "title", "slug"] = None,
-            *,
-            follow_pages: t.Literal[True],
-            return_metadata: t.Literal[False] = False,
+        self,
+        product_id: int,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal["date", "id", "include", "title", "slug"] = None,
+        *,
+        follow_pages: t.Literal[True],
+        return_metadata: t.Literal[False] = False,
     ) -> list[ProductVariation]: ...
-    
+
     def list_product_variations(
-            self,
-            product_id: int,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["date", "id", "include", "title", "slug"] = None,
-            follow_pages: bool = False,
-            return_metadata: bool = False,
+        self,
+        product_id: int,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal["date", "id", "include", "title", "slug"] = None,
+        follow_pages: bool = False,
+        return_metadata: bool = False,
     ) -> list[ProductVariation] | PaginatedResponse[ProductVariation]:
         """
         Lists all variations for a product.
-        
+
         :param product_id: id of the parent product
         :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :param return_metadata: If True, returns a PaginatedResponse with metadata instead of just a list. Cannot be used with follow_pages=True.
@@ -871,7 +1000,7 @@ class Woo:
         """
         if follow_pages and return_metadata:
             raise ValueError("Cannot use follow_pages=True with return_metadata=True")
-            
+
         params = {
             "context": context,
             "page": page,
@@ -887,17 +1016,17 @@ class Woo:
         }
         # Remove None values
         params = {k: v for k, v in params.items() if v is not None}
-        
+
         return self.api_object.get_all(
             f"products/{product_id}/variations",
             ProductVariation,
             follow_pages=follow_pages,
             include_metadata=return_metadata,
-            **params
+            **params,
         )
 
     def update_product_variation(
-            self, product_id: int, variation_id: int, variation: ProductVariation
+        self, product_id: int, variation_id: int, variation: ProductVariation
     ) -> ProductVariation:
         """
         Updates a product variation by its ID.
@@ -906,10 +1035,12 @@ class Woo:
         :param variation: ProductVariation object with updates
         :return: updated ProductVariation object
         """
-        return self.api_object.put(f"products/{product_id}/variations/{variation_id}", variation)
+        return self.api_object.put(
+            f"products/{product_id}/variations/{variation_id}", variation
+        )
 
     def delete_product_variation(
-            self, product_id: int, variation_id: int, force: bool = False
+        self, product_id: int, variation_id: int, force: bool = False
     ) -> None:
         """
         Deletes a product variation by its ID.
@@ -918,7 +1049,9 @@ class Woo:
         :param force: when True, the variation will be permanently deleted
         :return: None
         """
-        self.api_object.delete(f"products/{product_id}/variations/{variation_id}", force=force)
+        self.api_object.delete(
+            f"products/{product_id}/variations/{variation_id}", force=force
+        )
 
     # Product Categories
     def create_product_category(self, category: ProductCategory) -> ProductCategory:
@@ -935,95 +1068,105 @@ class Woo:
         :param category_id: id of the category
         :return: ProductCategory object or None if not found
         """
-        return self.api_object.get(f"products/categories/{category_id}", ProductCategory)
-    
+        return self.api_object.get(
+            f"products/categories/{category_id}", ProductCategory
+        )
+
     @t.overload
     def list_product_categories(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["id", "include", "name", "slug", "term_group", "description", "count"] = None,
-            hide_empty: bool = None,
-            parent: int | None = None,
-            product: int | None = None,
-            slug: str | None = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[True],
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        order: OrderType = None,
+        orderby: t.Literal[
+            "id", "include", "name", "slug", "term_group", "description", "count"
+        ] = None,
+        hide_empty: bool = None,
+        parent: int | None = None,
+        product: int | None = None,
+        slug: str | None = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[True],
     ) -> PaginatedResponse[ProductCategory]: ...
-    
+
     @t.overload
     def list_product_categories(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["id", "include", "name", "slug", "term_group", "description", "count"] = None,
-            hide_empty: bool = None,
-            parent: int | None = None,
-            product: int | None = None,
-            slug: str | None = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[False] = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        order: OrderType = None,
+        orderby: t.Literal[
+            "id", "include", "name", "slug", "term_group", "description", "count"
+        ] = None,
+        hide_empty: bool = None,
+        parent: int | None = None,
+        product: int | None = None,
+        slug: str | None = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[False] = False,
     ) -> list[ProductCategory]: ...
-    
+
     @t.overload
     def list_product_categories(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["id", "include", "name", "slug", "term_group", "description", "count"] = None,
-            hide_empty: bool = None,
-            parent: int | None = None,
-            product: int | None = None,
-            slug: str | None = None,
-            *,
-            follow_pages: t.Literal[True],
-            return_metadata: t.Literal[False] = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        order: OrderType = None,
+        orderby: t.Literal[
+            "id", "include", "name", "slug", "term_group", "description", "count"
+        ] = None,
+        hide_empty: bool = None,
+        parent: int | None = None,
+        product: int | None = None,
+        slug: str | None = None,
+        *,
+        follow_pages: t.Literal[True],
+        return_metadata: t.Literal[False] = False,
     ) -> list[ProductCategory]: ...
-    
+
     def list_product_categories(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["id", "include", "name", "slug", "term_group", "description", "count"] = None,
-            hide_empty: bool = None,
-            parent: int | None = None,
-            product: int | None = None,
-            slug: str | None = None,
-            follow_pages: bool = False,
-            return_metadata: bool = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        order: OrderType = None,
+        orderby: t.Literal[
+            "id", "include", "name", "slug", "term_group", "description", "count"
+        ] = None,
+        hide_empty: bool = None,
+        parent: int | None = None,
+        product: int | None = None,
+        slug: str | None = None,
+        follow_pages: bool = False,
+        return_metadata: bool = False,
     ) -> list[ProductCategory] | PaginatedResponse[ProductCategory]:
         """
         Lists all product categories.
-        
+
         :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :param return_metadata: If True, returns a PaginatedResponse with metadata instead of just a list. Cannot be used with follow_pages=True.
         :return: A list of ProductCategory objects or a PaginatedResponse containing the list and pagination metadata.
         """
         if follow_pages and return_metadata:
             raise ValueError("Cannot use follow_pages=True with return_metadata=True")
-            
+
         params = {
             "context": context,
             "page": page,
@@ -1040,17 +1183,17 @@ class Woo:
         }
         # Remove None values
         params = {k: v for k, v in params.items() if v is not None}
-        
+
         return self.api_object.get_all(
             "products/categories",
             ProductCategory,
             follow_pages=follow_pages,
             include_metadata=return_metadata,
-            **params
+            **params,
         )
 
     def update_product_category(
-            self, category_id: int, category: ProductCategory
+        self, category_id: int, category: ProductCategory
     ) -> ProductCategory:
         """
         Updates a product category by its ID.
@@ -1085,94 +1228,102 @@ class Woo:
         :return: ProductTag object or None if not found
         """
         return self.api_object.get(f"products/tags/{tag_id}", ProductTag)
-    
+
     @t.overload
     def list_product_tags(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["id", "include", "name", "slug", "term_group", "description", "count"] = None,
-            hide_empty: bool = None,
-            product: int | None = None,
-            slug: str | None = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[True],
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal[
+            "id", "include", "name", "slug", "term_group", "description", "count"
+        ] = None,
+        hide_empty: bool = None,
+        product: int | None = None,
+        slug: str | None = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[True],
     ) -> PaginatedResponse[ProductTag]: ...
-    
+
     @t.overload
     def list_product_tags(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["id", "include", "name", "slug", "term_group", "description", "count"] = None,
-            hide_empty: bool = None,
-            product: int | None = None,
-            slug: str | None = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[False] = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal[
+            "id", "include", "name", "slug", "term_group", "description", "count"
+        ] = None,
+        hide_empty: bool = None,
+        product: int | None = None,
+        slug: str | None = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[False] = False,
     ) -> list[ProductTag]: ...
-    
+
     @t.overload
     def list_product_tags(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["id", "include", "name", "slug", "term_group", "description", "count"] = None,
-            hide_empty: bool = None,
-            product: int | None = None,
-            slug: str | None = None,
-            *,
-            follow_pages: t.Literal[True],
-            return_metadata: t.Literal[False] = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal[
+            "id", "include", "name", "slug", "term_group", "description", "count"
+        ] = None,
+        hide_empty: bool = None,
+        product: int | None = None,
+        slug: str | None = None,
+        *,
+        follow_pages: t.Literal[True],
+        return_metadata: t.Literal[False] = False,
     ) -> list[ProductTag]: ...
-    
+
     def list_product_tags(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["id", "include", "name", "slug", "term_group", "description", "count"] = None,
-            hide_empty: bool = None,
-            product: int | None = None,
-            slug: str | None = None,
-            follow_pages: bool = False,
-            return_metadata: bool = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal[
+            "id", "include", "name", "slug", "term_group", "description", "count"
+        ] = None,
+        hide_empty: bool = None,
+        product: int | None = None,
+        slug: str | None = None,
+        follow_pages: bool = False,
+        return_metadata: bool = False,
     ) -> list[ProductTag] | PaginatedResponse[ProductTag]:
         """
         Lists all product tags.
-        
+
         :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :param return_metadata: If True, returns a PaginatedResponse with metadata instead of just a list. Cannot be used with follow_pages=True.
         :return: A list of ProductTag objects or a PaginatedResponse containing the list and pagination metadata.
         """
         if follow_pages and return_metadata:
             raise ValueError("Cannot use follow_pages=True with return_metadata=True")
-            
+
         params = {
             "context": context,
             "page": page,
@@ -1189,13 +1340,13 @@ class Woo:
         }
         # Remove None values
         params = {k: v for k, v in params.items() if v is not None}
-        
+
         return self.api_object.get_all(
             "products/tags",
             ProductTag,
             follow_pages=follow_pages,
             include_metadata=return_metadata,
-            **params
+            **params,
         )
 
     def update_product_tag(self, tag_id: int, tag: ProductTag) -> ProductTag:
@@ -1231,67 +1382,69 @@ class Woo:
         :param attribute_id: id of the attribute
         :return: ProductAttribute object or None if not found
         """
-        return self.api_object.get(f"products/attributes/{attribute_id}", ProductAttribute)
-    
+        return self.api_object.get(
+            f"products/attributes/{attribute_id}", ProductAttribute
+        )
+
     @t.overload
     def list_product_attributes(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            order: OrderType = None,
-            orderby: t.Literal["id", "name", "slug", "type", "order_by"] = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[True],
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        order: OrderType = None,
+        orderby: t.Literal["id", "name", "slug", "type", "order_by"] = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[True],
     ) -> PaginatedResponse[ProductAttribute]: ...
-    
+
     @t.overload
     def list_product_attributes(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            order: OrderType = None,
-            orderby: t.Literal["id", "name", "slug", "type", "order_by"] = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[False] = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        order: OrderType = None,
+        orderby: t.Literal["id", "name", "slug", "type", "order_by"] = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[False] = False,
     ) -> list[ProductAttribute]: ...
-    
+
     @t.overload
     def list_product_attributes(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            order: OrderType = None,
-            orderby: t.Literal["id", "name", "slug", "type", "order_by"] = None,
-            *,
-            follow_pages: t.Literal[True],
-            return_metadata: t.Literal[False] = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        order: OrderType = None,
+        orderby: t.Literal["id", "name", "slug", "type", "order_by"] = None,
+        *,
+        follow_pages: t.Literal[True],
+        return_metadata: t.Literal[False] = False,
     ) -> list[ProductAttribute]: ...
-    
+
     def list_product_attributes(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            order: OrderType = None,
-            orderby: t.Literal["id", "name", "slug", "type", "order_by"] = None,
-            follow_pages: bool = False,
-            return_metadata: bool = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        order: OrderType = None,
+        orderby: t.Literal["id", "name", "slug", "type", "order_by"] = None,
+        follow_pages: bool = False,
+        return_metadata: bool = False,
     ) -> list[ProductAttribute] | PaginatedResponse[ProductAttribute]:
         """
         Lists all product attributes.
-        
+
         :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :param return_metadata: If True, returns a PaginatedResponse with metadata instead of just a list. Cannot be used with follow_pages=True.
         :return: A list of ProductAttribute objects or a PaginatedResponse containing the list and pagination metadata.
         """
         if follow_pages and return_metadata:
             raise ValueError("Cannot use follow_pages=True with return_metadata=True")
-            
+
         params = {
             "context": context,
             "page": page,
@@ -1301,17 +1454,17 @@ class Woo:
         }
         # Remove None values
         params = {k: v for k, v in params.items() if v is not None}
-        
+
         return self.api_object.get_all(
             "products/attributes",
             ProductAttribute,
             follow_pages=follow_pages,
             include_metadata=return_metadata,
-            **params
+            **params,
         )
 
     def update_product_attribute(
-            self, attribute_id: int, attribute: ProductAttribute
+        self, attribute_id: int, attribute: ProductAttribute
     ) -> ProductAttribute:
         """
         Updates a product attribute by its ID.
@@ -1346,106 +1499,122 @@ class Woo:
         :return: ProductReview object or None if not found
         """
         return self.api_object.get(f"products/reviews/{review_id}", ProductReview)
-    
+
     @t.overload
     def list_product_reviews(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["date", "date_gmt", "id", "include", "product", "rating"] = None,
-            reviewer: str | None = None,
-            reviewer_email: str | None = None,
-            product: int | None = None,
-            status: t.Literal["approved", "hold", "spam", "unspam", "trash", "untrash"] = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[True],
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal[
+            "date", "date_gmt", "id", "include", "product", "rating"
+        ] = None,
+        reviewer: str | None = None,
+        reviewer_email: str | None = None,
+        product: int | None = None,
+        status: t.Literal[
+            "approved", "hold", "spam", "unspam", "trash", "untrash"
+        ] = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[True],
     ) -> PaginatedResponse[ProductReview]: ...
-    
+
     @t.overload
     def list_product_reviews(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["date", "date_gmt", "id", "include", "product", "rating"] = None,
-            reviewer: str | None = None,
-            reviewer_email: str | None = None,
-            product: int | None = None,
-            status: t.Literal["approved", "hold", "spam", "unspam", "trash", "untrash"] = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[False] = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal[
+            "date", "date_gmt", "id", "include", "product", "rating"
+        ] = None,
+        reviewer: str | None = None,
+        reviewer_email: str | None = None,
+        product: int | None = None,
+        status: t.Literal[
+            "approved", "hold", "spam", "unspam", "trash", "untrash"
+        ] = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[False] = False,
     ) -> list[ProductReview]: ...
-    
+
     @t.overload
     def list_product_reviews(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["date", "date_gmt", "id", "include", "product", "rating"] = None,
-            reviewer: str | None = None,
-            reviewer_email: str | None = None,
-            product: int | None = None,
-            status: t.Literal["approved", "hold", "spam", "unspam", "trash", "untrash"] = None,
-            *,
-            follow_pages: t.Literal[True],
-            return_metadata: t.Literal[False] = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal[
+            "date", "date_gmt", "id", "include", "product", "rating"
+        ] = None,
+        reviewer: str | None = None,
+        reviewer_email: str | None = None,
+        product: int | None = None,
+        status: t.Literal[
+            "approved", "hold", "spam", "unspam", "trash", "untrash"
+        ] = None,
+        *,
+        follow_pages: t.Literal[True],
+        return_metadata: t.Literal[False] = False,
     ) -> list[ProductReview]: ...
-    
+
     def list_product_reviews(
-            self,
-            context: ContextType = None,
-            page: int = None,
-            per_page: int = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType = None,
-            orderby: t.Literal["date", "date_gmt", "id", "include", "product", "rating"] = None,
-            reviewer: str | None = None,
-            reviewer_email: str | None = None,
-            product: int | None = None,
-            status: t.Literal["approved", "hold", "spam", "unspam", "trash", "untrash"] = None,
-            follow_pages: bool = False,
-            return_metadata: bool = False,
+        self,
+        context: ContextType = None,
+        page: int = None,
+        per_page: int = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType = None,
+        orderby: t.Literal[
+            "date", "date_gmt", "id", "include", "product", "rating"
+        ] = None,
+        reviewer: str | None = None,
+        reviewer_email: str | None = None,
+        product: int | None = None,
+        status: t.Literal[
+            "approved", "hold", "spam", "unspam", "trash", "untrash"
+        ] = None,
+        follow_pages: bool = False,
+        return_metadata: bool = False,
     ) -> list[ProductReview] | PaginatedResponse[ProductReview]:
         """
         Lists all product reviews.
-        
+
         :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :param return_metadata: If True, returns a PaginatedResponse with metadata instead of just a list. Cannot be used with follow_pages=True.
         :return: A list of ProductReview objects or a PaginatedResponse containing the list and pagination metadata.
         """
         if follow_pages and return_metadata:
             raise ValueError("Cannot use follow_pages=True with return_metadata=True")
-            
+
         params = {
             "context": context,
             "page": page,
@@ -1465,17 +1634,17 @@ class Woo:
         }
         # Remove None values
         params = {k: v for k, v in params.items() if v is not None}
-        
+
         return self.api_object.get_all(
             "products/reviews",
             ProductReview,
             follow_pages=follow_pages,
             include_metadata=return_metadata,
-            **params
+            **params,
         )
 
     def update_product_review(
-            self, review_id: int, review: ProductReview
+        self, review_id: int, review: ProductReview
     ) -> ProductReview:
         """
         Updates a product review by its ID.
@@ -1502,7 +1671,7 @@ class Woo:
         follow_pages: t.Literal[False] = False,
         return_metadata: t.Literal[True],
     ) -> PaginatedResponse[PaymentGateway]: ...
-    
+
     @t.overload
     def list_payment_gateways(
         self,
@@ -1510,7 +1679,7 @@ class Woo:
         follow_pages: t.Literal[False] = False,
         return_metadata: t.Literal[False] = False,
     ) -> list[PaymentGateway]: ...
-    
+
     @t.overload
     def list_payment_gateways(
         self,
@@ -1518,7 +1687,7 @@ class Woo:
         follow_pages: t.Literal[True],
         return_metadata: t.Literal[False] = False,
     ) -> list[PaymentGateway]: ...
-    
+
     def list_payment_gateways(
         self,
         follow_pages: bool = False,
@@ -1526,14 +1695,14 @@ class Woo:
     ) -> list[PaymentGateway] | PaginatedResponse[PaymentGateway]:
         """
         Lists all payment gateways.
-        
+
         :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :param return_metadata: If True, returns a PaginatedResponse with metadata instead of just a list. Cannot be used with follow_pages=True.
         :return: A list of PaymentGateway objects or a PaginatedResponse containing the list and pagination metadata.
         """
         if follow_pages and return_metadata:
             raise ValueError("Cannot use follow_pages=True with return_metadata=True")
-            
+
         return self.api_object.get_all(
             "payment_gateways",
             PaymentGateway,
@@ -1550,7 +1719,7 @@ class Woo:
         return self.api_object.get(f"payment_gateways/{gateway_id}", PaymentGateway)
 
     def update_payment_gateway(
-            self, gateway_id: str, gateway: PaymentGateway
+        self, gateway_id: str, gateway: PaymentGateway
     ) -> PaymentGateway:
         """
         Updates a payment gateway by its ID.
@@ -1560,7 +1729,6 @@ class Woo:
         """
         return self.api_object.put(f"payment_gateways/{gateway_id}", gateway)
 
-
     # Data endpoints
     def get_countries(self, follow_pages: bool = False) -> list[Country]:
         """
@@ -1568,7 +1736,9 @@ class Woo:
         :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :return: list of Country objects
         """
-        return self.api_object.get_all("data/countries", Country, follow_pages=follow_pages)
+        return self.api_object.get_all(
+            "data/countries", Country, follow_pages=follow_pages
+        )
 
     def get_country(self, country_code: str) -> Country | None:
         """
@@ -1584,7 +1754,9 @@ class Woo:
         :param follow_pages: Whether to automatically follow pagination and get all pages. Defaults to False.
         :return: list of Currency objects
         """
-        return self.api_object.get_all("data/currencies", Currency, follow_pages=follow_pages)
+        return self.api_object.get_all(
+            "data/currencies", Currency, follow_pages=follow_pages
+        )
 
     def get_currency(self, currency_code: str) -> Currency | None:
         """
@@ -1613,7 +1785,7 @@ class Woo:
             params["date_min"] = date_min
         if date_max:
             params["date_max"] = date_max
-            
+
         sales_report = self.api_object.get_all("reports/sales", SalesReport, **params)
 
         if sales_report:
@@ -1638,13 +1810,11 @@ class Woo:
             params["date_min"] = date_min
         if date_max:
             params["date_max"] = date_max
-            
+
         return self.api_object.get_all(
-            "reports/top_sellers",
-            TopSellersReport,
-            **params
+            "reports/top_sellers", TopSellersReport, **params
         )
-        
+
     # Settings
     def get_settings(self, group: str | None = None) -> list[SettingOption]:
         """
@@ -1655,9 +1825,9 @@ class Woo:
         endpoint = "settings"
         if group:
             endpoint = f"settings/{group}"
-            
+
         return self.api_object.get_all(endpoint, SettingOption)
-        
+
     def get_setting(self, group: str, id: str) -> SettingOption | None:
         """
         Gets a specific setting.
@@ -1666,7 +1836,7 @@ class Woo:
         :return: SettingOption object or None if not found
         """
         return self.api_object.get(f"settings/{group}/{id}", SettingOption)
-        
+
     def update_setting(
         self, group: str, id: str, setting: SettingOption
     ) -> SettingOption:
@@ -1696,93 +1866,94 @@ class Woo:
         :param refund_id: id of the refund
         :return: OrderRefund object or None if not found
         """
-        return self.api_object.get(f"orders/{order_id}/refunds/{refund_id}", OrderRefund)
-    
-    
+        return self.api_object.get(
+            f"orders/{order_id}/refunds/{refund_id}", OrderRefund
+        )
+
     @t.overload
     def list_order_refunds(
-            self,
-            order_id: int,
-            context: str = None,
-            page: int = None,
-            per_page: int = None,
-            search: str = None,
-            after: str = None,
-            before: str = None,
-            exclude: list[int] = None,
-            include: list[int] = None,
-            offset: int = None,
-            order: str = None,
-            orderby: str = None,
-            dp: int = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[True],
+        self,
+        order_id: int,
+        context: str = None,
+        page: int = None,
+        per_page: int = None,
+        search: str = None,
+        after: str = None,
+        before: str = None,
+        exclude: list[int] = None,
+        include: list[int] = None,
+        offset: int = None,
+        order: str = None,
+        orderby: str = None,
+        dp: int = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[True],
     ) -> PaginatedResponse[OrderRefund]: ...
-    
+
     @t.overload
     def list_order_refunds(
-            self,
-            order_id: int,
-            context: str = None,
-            page: int = None,
-            per_page: int = None,
-            search: str = None,
-            after: str = None,
-            before: str = None,
-            exclude: list[int] = None,
-            include: list[int] = None,
-            offset: int = None,
-            order: str = None,
-            orderby: str = None,
-            dp: int = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[False] = False,
+        self,
+        order_id: int,
+        context: str = None,
+        page: int = None,
+        per_page: int = None,
+        search: str = None,
+        after: str = None,
+        before: str = None,
+        exclude: list[int] = None,
+        include: list[int] = None,
+        offset: int = None,
+        order: str = None,
+        orderby: str = None,
+        dp: int = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[False] = False,
     ) -> list[OrderRefund]: ...
-    
+
     @t.overload
     def list_order_refunds(
-            self,
-            order_id: int,
-            context: str = None,
-            page: int = None,
-            per_page: int = None,
-            search: str = None,
-            after: str = None,
-            before: str = None,
-            exclude: list[int] = None,
-            include: list[int] = None,
-            offset: int = None,
-            order: str = None,
-            orderby: str = None,
-            dp: int = None,
-            *,
-            follow_pages: t.Literal[True],
-            return_metadata: t.Literal[False] = False,
+        self,
+        order_id: int,
+        context: str = None,
+        page: int = None,
+        per_page: int = None,
+        search: str = None,
+        after: str = None,
+        before: str = None,
+        exclude: list[int] = None,
+        include: list[int] = None,
+        offset: int = None,
+        order: str = None,
+        orderby: str = None,
+        dp: int = None,
+        *,
+        follow_pages: t.Literal[True],
+        return_metadata: t.Literal[False] = False,
     ) -> list[OrderRefund]: ...
-    
+
     def list_order_refunds(
-            self,
-            order_id: int,
-            context: str = None,
-            page: int = None,
-            per_page: int = None,
-            search: str = None,
-            after: str = None,
-            before: str = None,
-            exclude: list[int] = None,
-            include: list[int] = None,
-            offset: int = None,
-            order: str = None,
-            orderby: str = None,
-            dp: int = None,
-            follow_pages: bool = False,
-            return_metadata: bool = False,
+        self,
+        order_id: int,
+        context: str = None,
+        page: int = None,
+        per_page: int = None,
+        search: str = None,
+        after: str = None,
+        before: str = None,
+        exclude: list[int] = None,
+        include: list[int] = None,
+        offset: int = None,
+        order: str = None,
+        orderby: str = None,
+        dp: int = None,
+        follow_pages: bool = False,
+        return_metadata: bool = False,
     ) -> list[OrderRefund] | PaginatedResponse[OrderRefund]:
         """
         Lists all refunds for a given order.
-        
+
         :param order_id: id of the order
         :param context: scope under which the request is made; determines fields present in the response
         :param page: current page of the collection
@@ -1802,7 +1973,7 @@ class Woo:
         """
         if follow_pages and return_metadata:
             raise ValueError("Cannot use follow_pages=True with return_metadata=True")
-            
+
         params = {
             "context": context,
             "page": page,
@@ -1821,14 +1992,16 @@ class Woo:
         params = {k: v for k, v in params.items() if v is not None}
 
         return self.api_object.get_all(
-            f"orders/{order_id}/refunds", 
-            OrderRefund, 
-            follow_pages=follow_pages, 
+            f"orders/{order_id}/refunds",
+            OrderRefund,
+            follow_pages=follow_pages,
             include_metadata=return_metadata,
-            **params
+            **params,
         )
 
-    def delete_order_refund(self, order_id: int, refund_id: int, force: bool = None) -> None:
+    def delete_order_refund(
+        self, order_id: int, refund_id: int, force: bool = None
+    ) -> None:
         """
         Deletes an order refund by its ID.
         :param order_id: id of the order
@@ -1853,115 +2026,123 @@ class Woo:
         :return: The Order object if found, otherwise None.
         """
         return self.api_object.get(f"orders/{order_id}", Order)
-    
+
     @t.overload
     def list_orders(
-            self,
-            context: ContextType | None = None,
-            page: int | None = None,
-            per_page: int | None = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            modified_after: str | None = None,
-            modified_before: str | None = None,
-            dates_are_gmt: bool | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType | None = None,
-            orderby: t.Literal["date", "modified", "id", "include", "title", "slug"] | None = None,
-            parent: list[int] | None = None,
-            parent_exclude: list[int] | None = None,
-            status: list[str] | None = None,
-            customer: int | None = None,
-            product: int | None = None,
-            dp: int | None = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[True],
+        self,
+        context: ContextType | None = None,
+        page: int | None = None,
+        per_page: int | None = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        modified_after: str | None = None,
+        modified_before: str | None = None,
+        dates_are_gmt: bool | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType | None = None,
+        orderby: (
+            t.Literal["date", "modified", "id", "include", "title", "slug"] | None
+        ) = None,
+        parent: list[int] | None = None,
+        parent_exclude: list[int] | None = None,
+        status: list[str] | None = None,
+        customer: int | None = None,
+        product: int | None = None,
+        dp: int | None = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[True],
     ) -> PaginatedResponse[Order]: ...
-    
+
     @t.overload
     def list_orders(
-            self,
-            context: ContextType | None = None,
-            page: int | None = None,
-            per_page: int | None = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            modified_after: str | None = None,
-            modified_before: str | None = None,
-            dates_are_gmt: bool | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType | None = None,
-            orderby: t.Literal["date", "modified", "id", "include", "title", "slug"] | None = None,
-            parent: list[int] | None = None,
-            parent_exclude: list[int] | None = None,
-            status: list[str] | None = None,
-            customer: int | None = None,
-            product: int | None = None,
-            dp: int | None = None,
-            *,
-            follow_pages: t.Literal[False] = False,
-            return_metadata: t.Literal[False] = False,
+        self,
+        context: ContextType | None = None,
+        page: int | None = None,
+        per_page: int | None = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        modified_after: str | None = None,
+        modified_before: str | None = None,
+        dates_are_gmt: bool | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType | None = None,
+        orderby: (
+            t.Literal["date", "modified", "id", "include", "title", "slug"] | None
+        ) = None,
+        parent: list[int] | None = None,
+        parent_exclude: list[int] | None = None,
+        status: list[str] | None = None,
+        customer: int | None = None,
+        product: int | None = None,
+        dp: int | None = None,
+        *,
+        follow_pages: t.Literal[False] = False,
+        return_metadata: t.Literal[False] = False,
     ) -> list[Order]: ...
-    
+
     @t.overload
     def list_orders(
-            self,
-            context: ContextType | None = None,
-            page: int | None = None,
-            per_page: int | None = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            modified_after: str | None = None,
-            modified_before: str | None = None,
-            dates_are_gmt: bool | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType | None = None,
-            orderby: t.Literal["date", "modified", "id", "include", "title", "slug"] | None = None,
-            parent: list[int] | None = None,
-            parent_exclude: list[int] | None = None,
-            status: list[str] | None = None,
-            customer: int | None = None,
-            product: int | None = None,
-            dp: int | None = None,
-            *,
-            follow_pages: t.Literal[True],
-            return_metadata: t.Literal[False] = False,
+        self,
+        context: ContextType | None = None,
+        page: int | None = None,
+        per_page: int | None = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        modified_after: str | None = None,
+        modified_before: str | None = None,
+        dates_are_gmt: bool | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType | None = None,
+        orderby: (
+            t.Literal["date", "modified", "id", "include", "title", "slug"] | None
+        ) = None,
+        parent: list[int] | None = None,
+        parent_exclude: list[int] | None = None,
+        status: list[str] | None = None,
+        customer: int | None = None,
+        product: int | None = None,
+        dp: int | None = None,
+        *,
+        follow_pages: t.Literal[True],
+        return_metadata: t.Literal[False] = False,
     ) -> list[Order]: ...
-    
+
     def list_orders(
-            self,
-            context: ContextType | None = None,
-            page: int | None = None,
-            per_page: int | None = None,
-            search: str | None = None,
-            after: str | None = None,
-            before: str | None = None,
-            modified_after: str | None = None,
-            modified_before: str | None = None,
-            dates_are_gmt: bool | None = None,
-            exclude: list[int] | None = None,
-            include: list[int] | None = None,
-            offset: int | None = None,
-            order: OrderType | None = None,
-            orderby: t.Literal["date", "modified", "id", "include", "title", "slug"] | None = None,
-            parent: list[int] | None = None,
-            parent_exclude: list[int] | None = None,
-            status: list[str] | None = None,
-            customer: int | None = None,
-            product: int | None = None,
-            dp: int | None = None,
-            follow_pages: bool = False,
-            return_metadata: bool = False,
+        self,
+        context: ContextType | None = None,
+        page: int | None = None,
+        per_page: int | None = None,
+        search: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        modified_after: str | None = None,
+        modified_before: str | None = None,
+        dates_are_gmt: bool | None = None,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        offset: int | None = None,
+        order: OrderType | None = None,
+        orderby: (
+            t.Literal["date", "modified", "id", "include", "title", "slug"] | None
+        ) = None,
+        parent: list[int] | None = None,
+        parent_exclude: list[int] | None = None,
+        status: list[str] | None = None,
+        customer: int | None = None,
+        product: int | None = None,
+        dp: int | None = None,
+        follow_pages: bool = False,
+        return_metadata: bool = False,
     ) -> list[Order] | PaginatedResponse[Order]:
         """
         Lists orders with optional filtering.
@@ -1988,7 +2169,7 @@ class Woo:
         """
         if follow_pages and return_metadata:
             raise ValueError("Cannot use follow_pages=True with return_metadata=True")
-            
+
         params = {
             "context": context,
             "page": page,
@@ -2013,13 +2194,13 @@ class Woo:
         }
         # Remove any parameters that are None.
         params = {k: v for k, v in params.items() if v is not None}
-        
+
         return self.api_object.get_all(
-            "orders", 
-            Order, 
+            "orders",
+            Order,
             follow_pages=follow_pages,
             include_metadata=return_metadata,
-            **params
+            **params,
         )
 
     def update_order(self, order_id: int, order: Order) -> Order:

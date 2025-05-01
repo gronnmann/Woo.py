@@ -12,6 +12,7 @@ class ProductCategoryDisplay(str, Enum):
     SUBCATEGORIES = "subcategories"
     BOTH = "both"
 
+
 class ProductCategoryImage(BaseModel):
     id: int | None = None
     date_created: datetime.datetime | None = None

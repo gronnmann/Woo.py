@@ -36,9 +36,11 @@ class PaymentGateway(BaseModel):
     id: str
     title: str | None = None  # Make title optional since it can be None in responses
     description: str | None = None
-    order: int | Literal[''] | None = None # No sort order -> gives ''
+    order: int | Literal[""] | None = None  # No sort order -> gives ''
     enabled: bool = False
     method_title: str | None = None
     method_description: str | None = None
     method_supports: List[str] = []
-    settings: list[PaymentGatewaySetting] | Dict[str, PaymentGatewaySetting] | None = None
+    settings: list[PaymentGatewaySetting] | Dict[str, PaymentGatewaySetting] | None = (
+        None
+    )
