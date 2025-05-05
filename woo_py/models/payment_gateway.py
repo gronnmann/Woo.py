@@ -41,6 +41,6 @@ class PaymentGateway(BaseModel):
     method_title: str | None = None
     method_description: str | None = None
     method_supports: List[str] = []
-    settings: list[PaymentGatewaySetting] | Dict[str, PaymentGatewaySetting] | None = (
+    settings: list[PaymentGatewaySetting] | Dict[str, PaymentGatewaySetting] | dict | None = (
         None
     )

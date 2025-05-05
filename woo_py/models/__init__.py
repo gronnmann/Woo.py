@@ -96,7 +96,7 @@ class Dimensions(BaseModel):
 
 
 class DownloadProperties(BaseModel):
-    id: int
+    id: str
     name: str
     file: str
 
